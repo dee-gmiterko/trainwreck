@@ -21,14 +21,14 @@ export default class Train extends PIXI.Container {
 	move() {
 		var getY = (x) => {
 			var y1 = World.PIECE_HEIGHT * this.path[Math.floor(x / World.PIECE_WIDTH)];
-			var y2 = Train.CART_OFFSET_Y + World.PIECE_HEIGHT * this.path[Math.floor(x / World.PIECE_WIDTH) + 1];
+			var y2 = World.PIECE_HEIGHT * this.path[Math.floor(x / World.PIECE_WIDTH) + 1];
 			var t = (x % World.PIECE_WIDTH) / World.PIECE_WIDTH;
 			return y1 + t * (y2 - y1);
 		}
 		var getAngle = (x) => {
-			var y1 = World.PIECE_HEIGHT * this.path[Math.floor(x / World.PIECE_WIDTH)];
-			var y2 = World.PIECE_HEIGHT * this.path[Math.floor(x / World.PIECE_WIDTH) + 1];
-			return Math.tan((y2 - y1) / World.PIECE_WIDTH);
+			var y1 = getY(x - Train.CART_WIDTH2);
+			var y2 = getY(x + Train.CART_WIDTH2);
+			return Math.tan((y2 - y1) / Train.CART_WIDTH);
 		}
 
 		//move locomotive
@@ -46,22 +46,35 @@ export default class Train extends PIXI.Container {
 			dy = dy * l;
 			this.children[i].x = this.children[i-1].x + dx;
 			this.children[i].y = this.children[i-1].y + dy;
+			this.children[i].rotation = getAngle(this.children[i].x);
 		}
 	}
 
 	addCart() {
 		var cartContainer = new PIXI.Sprite();
 		
-		var cart = new PIXI.Graphics();
-		cart.width = Train.CART_WIDTH;
-		cart.width = Train.CART_HEIGHT;
-		cart.beginFill(0xFFFF00);
-		cart.drawRect(0, 0, Train.CART_WIDTH, Train.CART_HEIGHT);
+		var cartTop = new PIXI.Graphics();
+		cartTop.width = Train.CART_WIDTH;
+		cartTop.width = Train.CART_HEIGHT;
+		cartTop.beginFill(0xFFFF00);
+		cartTop.drawRect(0, 0, Train.CART_WIDTH, Train.CART_HEIGHT);
 
-		cartContainer.anchor.x = 0.5;
-		cartContainer.anchor.y = 0.5;
+		cartTop.x = -Train.CART_WIDTH2;
+		cartTop.y = -Train.CART_HEIGHT2;
 
-		cartContainer.addChild(cart);
+		cartContainer.addChild(cartTop);
+
+		var cartBottom = new PIXI.Graphics();
+		cartBottom.width = Train.CART_WIDTH;
+		cartBottom.width = Train.CART_HEIGHT;
+		cartBottom.beginFill(0xFFFF00);
+		cartBottom.drawRect(0, 0, Train.CART_WIDTH, Train.CART_HEIGHT);
+
+		cartBottom.x = -Train.CART_WIDTH2;
+		cartBottom.y = -Train.CART_HEIGHT2;
+
+		cartContainer.addChild(cartBottom);
+
 		this.addChild(cartContainer);
 	}
 
@@ -84,4 +97,6 @@ Train.RIGHT = 1;
 
 Train.CART_WIDTH = 30;
 Train.CART_HEIGHT = 10;
+Train.CART_WIDTH2 = Train.CART_WIDTH / 2;
+Train.CART_HEIGHT2 = Train.CART_HEIGHT / 2;
 Train.CART_DELAY = 32;
