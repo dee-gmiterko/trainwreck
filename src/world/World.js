@@ -69,7 +69,7 @@ export default class World extends PIXI.Container {
 			use: (railsBefore, rails, railIndex) => {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
 			}
-		}, 8);
+		}, 6);
 
 		//up
 		addRailType({
@@ -79,7 +79,7 @@ export default class World extends PIXI.Container {
 			use: (railsBefore, rails, railIndex) => {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex + 1], railIndex + 1);
 			}
-		}, 1);
+		}, 2);
 
 		//down
 		addRailType({
@@ -89,12 +89,17 @@ export default class World extends PIXI.Container {
 			use: (railsBefore, rails, railIndex) => {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex - 1], railIndex - 1);
 			}
-		}, 1);
+		}, 2);
 
 		//split up
 		addRailType({
 			canUse: (railsBefore, rails, railIndex) => {
-				return rails[railIndex] !== undefined && rails[railIndex + 1] !== undefined;
+				return rails[railIndex] !== undefined
+					&& rails[railIndex + 1] !== undefined
+					//max one switch
+					&& rails[railIndex + 1].railsCount() <= 2
+					&& rails[railIndex].railsCount() <= 2
+					&& railsBefore[railIndex].railsCount() <= 2;
 			},
 			use: (railsBefore, rails, railIndex) => {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex + 1], railIndex + 1);
@@ -105,7 +110,12 @@ export default class World extends PIXI.Container {
 		//split down
 		addRailType({
 			canUse: (railsBefore, rails, railIndex) => {
-				return rails[railIndex] !== undefined && rails[railIndex - 1] !== undefined;
+				return rails[railIndex] !== undefined
+					&& rails[railIndex - 1] !== undefined
+					//max one switch
+					&& rails[railIndex - 1].railsCount() <= 2
+					&& rails[railIndex].railsCount() <= 2
+					&& railsBefore[railIndex].railsCount() <= 2;
 			},
 			use: (railsBefore, rails, railIndex) => {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex - 1], railIndex - 1);
@@ -116,7 +126,12 @@ export default class World extends PIXI.Container {
 		//backsplit up
 		addRailType({
 			canUse: (railsBefore, rails, railIndex) => {
-				return rails[railIndex] !== undefined && railsBefore[railIndex + 1] !== undefined;
+				return rails[railIndex] !== undefined
+					&& railsBefore[railIndex + 1] !== undefined
+					//max one switch
+					&& railsBefore[railIndex + 1].railsCount() <= 2
+					&& railsBefore[railIndex].railsCount() <= 2
+					&& rails[railIndex].railsCount() <= 2;
 			},
 			use: (railsBefore, rails, railIndex) => {
 				this.connectRails(railsBefore[railIndex + 1], railIndex + 1, rails[railIndex], railIndex);
@@ -127,7 +142,12 @@ export default class World extends PIXI.Container {
 		//backsplit down
 		addRailType({
 			canUse: (railsBefore, rails, railIndex) => {
-				return rails[railIndex] !== undefined && railsBefore[railIndex - 1] !== undefined;
+				return rails[railIndex] !== undefined
+					&& railsBefore[railIndex - 1] !== undefined
+					//max one switch
+					&& railsBefore[railIndex - 1].railsCount() <= 2
+					&& railsBefore[railIndex].railsCount() <= 2
+					&& rails[railIndex].railsCount() <= 2;
 			},
 			use: (railsBefore, rails, railIndex) => {
 				this.connectRails(railsBefore[railIndex - 1], railIndex - 1, rails[railIndex], railIndex);
@@ -148,7 +168,7 @@ export default class World extends PIXI.Container {
 			for(var railIndex in rails) {
 				var railPiece = rails[railIndex];
 
-				// if(!railPiece.isEmpty) {
+				if(!railPiece.isEmpty) {
 					var railSprite = new PIXI.Graphics();
 
 					this.displayRailPiece(railSprite, railPiece, railIndex);
@@ -159,7 +179,7 @@ export default class World extends PIXI.Container {
 					// railSprite.anchor.y = 0.5;
 
 					this.addChild(railSprite);
-				// }
+				}
 			}
 		}
 	}
@@ -168,8 +188,8 @@ export default class World extends PIXI.Container {
 		railSprite.width = World.PIECE_WIDTH;
 		railSprite.height = World.PIECE_HEIGHT;
 
-		railSprite.lineStyle(1, 0xFF0000);
-		railSprite.drawRect(1, 1, World.PIECE_WIDTH - 2, World.PIECE_HEIGHT - 2);
+		// railSprite.lineStyle(1, 0xFF0000);
+		// railSprite.drawRect(1, 1, World.PIECE_WIDTH - 2, World.PIECE_HEIGHT - 2);
 
 		for(var toRailIndex of railPiece.to) {
 			let h = toRailIndex - railIndex;

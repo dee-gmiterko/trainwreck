@@ -38,6 +38,6 @@ Stage interface:
 {
 	load = function()
 	unload = function()
-	play = function()
+	tick = function()
 }
 */

@@ -20,7 +20,8 @@ export default class StagePlay extends PIXI.Container {
 		this.train.x = World.PIECE_WIDTH2;
 		this.train.y = this.settings.height / 2 + World.PIECE_HEIGHT2;
 
-		this.switchCursor = new SwitchCursor(this.world);
+		this.switchCursor = new SwitchCursor(this.train);
+		this.switchCursor.y = this.settings.height / 2;
 
 		this.addChild(this.world);
 		this.addChild(this.train);
@@ -34,12 +35,14 @@ export default class StagePlay extends PIXI.Container {
 
 	tick() {
 		this.train.move();
+		this.switchCursor.recalculatePosition();
 
 		//move camera
 		if(this.train.children[0].x > this.cameraPosPercentage * this.settings.width) {
 			var camPos = this.cameraPosPercentage * this.settings.width - this.train.children[0].x;
 			this.world.x = camPos;
 			this.train.x = camPos + World.PIECE_WIDTH2;
+			this.switchCursor.x = camPos;
 		}
 	}
 

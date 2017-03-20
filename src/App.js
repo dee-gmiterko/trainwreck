@@ -5,8 +5,6 @@ import StagePlay from './stages/Play';
 export default class App {
 
 	constructor(settings) {
-		PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
-
 		this.settings = settings;
 		this.stages = new Stages();
 		

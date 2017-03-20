@@ -5,19 +5,19 @@ export default class RailPiece {
 		this.from = [];
 		this.isSwitch = false;
 		this.isEmpty = true;
-		this.isVagon = false;
+		this.isCart = false;
 	}
 
 	addFrom(railIndex) {
 		this.from.push(railIndex);
 		this.isEmpty = false;
-		this.isSwitch = this.from.length + this.to.length >= 2;
+		this.isSwitch = this.railsCount() > 2;
 	}
 
 	addTo(railIndex) {
 		this.to.push(railIndex);
 		this.isEmpty = false;
-		this.isSwitch = this.from.length + this.to.length >= 2;
+		this.isSwitch = this.railsCount() > 2;
 	}
 
 	isConnectedTo(railIndex) {
@@ -30,5 +30,9 @@ export default class RailPiece {
 
 	getFrom() {
 		return this.from[0];
+	}
+
+	railsCount() {
+		return this.from.length + this.to.length
 	}
 }

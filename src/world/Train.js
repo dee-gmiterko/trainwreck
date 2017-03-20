@@ -11,9 +11,9 @@ export default class Train extends PIXI.Container {
 
 		this.addCart();
 
-		var locomotive = this.children[0];
-		locomotive.x = 0;
-		locomotive.y = 0;
+		this.locomotive = this.children[0];
+		this.locomotive.x = 0;
+		this.locomotive.y = 0;
 		
 		this.recalculatePath();
 	}
@@ -32,10 +32,9 @@ export default class Train extends PIXI.Container {
 		}
 
 		//move locomotive
-		var locomotive = this.children[0];
-		locomotive.x += this.direction * this.speed;
-		locomotive.y = getY(locomotive.x);
-		locomotive.rotation = getAngle(locomotive.x);
+		this.locomotive.x += this.direction * this.speed;
+		this.locomotive.y = getY(this.locomotive.x);
+		this.locomotive.rotation = getAngle(this.locomotive.x);
 		
 		//move other carts
 		for(var i = 1; i < this.children.length; i++) {
@@ -64,7 +63,7 @@ export default class Train extends PIXI.Container {
 		
 		var cartBottom = new PIXI.Graphics();
 		cartBottom.width = Train.CART_WIDTH;
-		cartBottom.width = Train.CART_HEIGHT;
+		cartBottom.height = Train.CART_HEIGHT;
 		cartBottom.beginFill(0x999900);
 		cartBottom.drawRect(0, 0, Train.CART_WIDTH, Train.CART_HEIGHT);
 
@@ -75,7 +74,7 @@ export default class Train extends PIXI.Container {
 
 		var cartTop = new PIXI.Graphics();
 		cartTop.width = Train.CART_WIDTH;
-		cartTop.width = Train.CART_HEIGHT;
+		cartTop.height = Train.CART_HEIGHT;
 		cartTop.beginFill(0xFFFF00);
 		cartTop.drawRect(0, 0, Train.CART_WIDTH, Train.CART_HEIGHT);
 
