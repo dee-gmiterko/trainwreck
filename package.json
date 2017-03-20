@@ -1,9 +1,8 @@
 {
-  "name": "mqMove",
+  "name": "Trainwreck",
   "version": "1.0.0",
   "private": true,
-  "description": "Multiplayer game using questions from learning system to move.",
-  "homepage": "http://linzee.github.io/samos",
+  "homepage": "http://ienze.me/trainwreck",
   "scripts": {
     "start": "node ./scripts/start.js",
     "build": "node ./scripts/build.js && sw-precache --config=config/sw-precache-config.js",
@@ -82,10 +81,8 @@
   "eslintConfig": {
     "extends": "react-app",
     "globals": {
-      "hexi": true,
       "PIXI": true,
       "ga": true
     }
-  },
-  "proxy": "http://localhost:8123"
+  }
 }

@@ -3,7 +3,11 @@ import RailPiece from './RailPiece';
 export default class World extends PIXI.Container {
 
 	constructor() {
+		super();
+
 		this.rails = [];
+
+		this.initGenarator();
 
 		//init
 		var r0 = new RailPiece();
@@ -15,11 +19,11 @@ export default class World extends PIXI.Container {
 		this.rails.push({0: r1});
 		this.rails.push({0: r2});
 
-		for(int i=0; i<40; i++) {
-			generateNext(2 * Math.floor(i / 7) + 1);
+		for(var i=0; i<100; i++) {
+			this.generateNext((2 * Math.floor(Math.abs(Math.sin(i / 10)) * i / 7)) + 1);
 		}
 
-		display();
+		this.display();
 	}
 
 	connectRails(railA, indexA, railB, indexB) {
@@ -31,27 +35,108 @@ export default class World extends PIXI.Container {
 		var half = Math.floor(width / 2);
 		
 		var rails = {};
-		for(i=-half; i<=half; i++) {
+		for(var i=-half; i<=half; i++) {
 			rails[i] = new RailPiece();
 		}
 		this.rails.push(rails);
 
 		var railsBefore = this.rails[this.rails.length-2];
-		for(railIndex in Object.keys(railsBefore)) {
-			while(Math.random() > 0.5) {
-				var connectTo = Math.round(railIndex + (Math.random() * 2 - 1));
+		Object.keys(railsBefore).forEach(railIndex => {
+			railIndex = parseInt(railIndex);
 
-				if(rails[connectTo] == undefined) {
-					continue;
-				}
+			var usableGenerators = this.railGenerators.filter((railGenerator) => {
+				return railGenerator.canUse(railsBefore, rails, railIndex);
+			})
 
-				if(railsBefore[railIndex].isConnectedTo(connectTo)) {
-					continue;
-				}
+			if(usableGenerators.length > 0) {
+				var railGenerator = usableGenerators[Math.floor(Math.random() * usableGenerators.length)];
+				railGenerator.use(railsBefore, rails, railIndex);
+			}
+		});
+	}
 
-				connectRails(railsBefore[railIndex], railIndex, rails[connectTo], connectTo);
+	initGenarator() {
+		this.railGenerators = [];
+
+		var addRailType = (callback, rarity) => {
+			for(var i=0; i<rarity; i++) {
+				this.railGenerators.push(callback);
 			}
 		}
+
+		//straight
+		addRailType({
+			canUse: (railsBefore, rails, railIndex) => {
+				return rails[railIndex] !== undefined;
+			},
+			use: (railsBefore, rails, railIndex) => {
+				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
+			}
+		}, 8);
+
+		//up
+		addRailType({
+			canUse: (railsBefore, rails, railIndex) => {
+				return rails[railIndex + 1] !== undefined;
+			},
+			use: (railsBefore, rails, railIndex) => {
+				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex + 1], railIndex + 1);
+			}
+		}, 1);
+
+		//down
+		addRailType({
+			canUse: (railsBefore, rails, railIndex) => {
+				return rails[railIndex - 1] !== undefined;
+			},
+			use: (railsBefore, rails, railIndex) => {
+				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex - 1], railIndex - 1);
+			}
+		}, 1);
+
+		//split up
+		addRailType({
+			canUse: (railsBefore, rails, railIndex) => {
+				return rails[railIndex] !== undefined && rails[railIndex + 1] !== undefined;
+			},
+			use: (railsBefore, rails, railIndex) => {
+				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex + 1], railIndex + 1);
+				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
+			}
+		}, 1);
+
+		//split down
+		addRailType({
+			canUse: (railsBefore, rails, railIndex) => {
+				return rails[railIndex] !== undefined && rails[railIndex - 1] !== undefined;
+			},
+			use: (railsBefore, rails, railIndex) => {
+				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex - 1], railIndex - 1);
+				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
+			}
+		}, 1);
+
+		//backsplit up
+		addRailType({
+			canUse: (railsBefore, rails, railIndex) => {
+				return rails[railIndex] !== undefined && railsBefore[railIndex + 1] !== undefined;
+			},
+			use: (railsBefore, rails, railIndex) => {
+				this.connectRails(railsBefore[railIndex + 1], railIndex + 1, rails[railIndex], railIndex);
+				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
+			}
+		}, 1);
+
+		//backsplit down
+		addRailType({
+			canUse: (railsBefore, rails, railIndex) => {
+				return rails[railIndex] !== undefined && railsBefore[railIndex - 1] !== undefined;
+			},
+			use: (railsBefore, rails, railIndex) => {
+				this.connectRails(railsBefore[railIndex - 1], railIndex - 1, rails[railIndex], railIndex);
+				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
+			}
+		}, 1);
 	}
 
 	display() {
@@ -61,47 +146,55 @@ export default class World extends PIXI.Container {
 		}
 
 		//add rails
-		for(int i=0; i<this.rails.length; i++) {
+		for(i=0; i<this.rails.length; i++) {
 			var rails = this.rails[i];
-			for(railIndex in Object.keys(rails)) {
+			for(var railIndex in rails) {
 				var railPiece = rails[railIndex];
 
-				if(!railPiece.isEmpty) {
+				// if(!railPiece.isEmpty) {
 					var railSprite = new PIXI.Graphics();
 
-					displayRailPiece(railSprite, railPiece, railIndex);
+					this.displayRailPiece(railSprite, railPiece, railIndex);
 
-					railSprite.x = i * 100;
-					railSprite.y = railIndex * 50;
-					railSprite.anchor.x = 0.5;
-					railSprite.anchor.y = 0.5;
+					railSprite.x = i * this.PIECE_WIDTH;
+					railSprite.y = railIndex * this.PIECE_HEIGHT;
+					// railSprite.anchor.x = 0.5;
+					// railSprite.anchor.y = 0.5;
 
 					this.addChild(railSprite);
-				}
+				// }
 			}
 		}
 	}
 
 	displayRailPiece(railSprite, railPiece, railIndex) {
-		railSprite.width = 100;
-		railSprite.height = 50;
+		railSprite.width = this.PIECE_WIDTH;
+		railSprite.height = this.PIECE_HEIGHT;
 
-		for(toRailIndex in railPiece.to) {
-			var h = toRailIndex - railIndex;
+		railSprite.lineStyle(1, 0xFF0000);
+		railSprite.drawRect(1, 1, this.PIECE_WIDTH - 2, this.PIECE_HEIGHT - 2);
 
+		for(var toRailIndex of railPiece.to) {
+			let h = toRailIndex - railIndex;
+			console.log(h);
 			railSprite.lineStyle(5, 0xffffff);
-			railSprite.moveTo(50, 25);
-			railSprite.lineTo(100, 50 + h * 25);
+			railSprite.moveTo(this.PIECE_WIDTH2, this.PIECE_HEIGHT2);
+			railSprite.lineTo(this.PIECE_WIDTH, this.PIECE_HEIGHT2 + h * this.PIECE_HEIGHT2);
 			railSprite.endFill();
 		}
 
-		for(fromRailIndex in railPiece.from) {
-			var h = fromRailIndex - railIndex;
+		for(var fromRailIndex of railPiece.from) {
+			let h = fromRailIndex - railIndex;
 
 			railSprite.lineStyle(5, 0xffffff);
-			railSprite.moveTo(50, 25);
-			railSprite.lineTo(0, 50 + h * 25);
+			railSprite.moveTo(this.PIECE_WIDTH2, this.PIECE_HEIGHT2);
+			railSprite.lineTo(0, this.PIECE_HEIGHT2 + h * this.PIECE_HEIGHT2);
 			railSprite.endFill();
 		}
 	}
 }
+
+World.PIECE_WIDTH = 50;
+World.PIECE_HEIGHT = 20;
+World.PIECE_WIDTH2 = this.PIECE_WIDTH / 2;
+World.PIECE_HEIGHT2 = this.PIECE_HEIGHT / 2;

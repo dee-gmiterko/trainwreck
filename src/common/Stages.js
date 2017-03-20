@@ -23,6 +23,10 @@ export default class Stages {
 	getStage(name) {
 		return this.list[name];
 	}
+
+	beforeRender() {
+		this.current.tick();
+	}
 }
 
 /*

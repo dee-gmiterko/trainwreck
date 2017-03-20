@@ -21,8 +21,6 @@ var fs = require('fs');
 var config = require('../config/webpack.config.dev');
 var paths = require('../config/paths');
 
-var diffsync = require('../server/diffsync');
-
 var useYarn = fs.existsSync(paths.yarnLockFile);
 var cli = useYarn ? 'yarn' : 'npm';
 var isInteractive = process.stdout.isTTY;
@@ -248,9 +246,6 @@ function runDevServer(host, port, protocol) {
 
   // Our custom middleware proxies requests to /index.html or a remote API.
   addMiddleware(devServer);
-
-  // Most important part (for me), run internal diffsync server
-  // diffsync(devServer);
 
   // Launch WebpackDevServer.
   devServer.listen(port, (err, result) => {

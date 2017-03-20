@@ -10,8 +10,8 @@ export default class App {
 		this.settings = settings;
 		this.stages = new Stages();
 		
-		this.stages.addStage("menu", new StageMenu(this.g, this.stages, settings));
-		this.stages.addStage("play", new StagePlay(this.g, this.stages, settings));
+		this.stages.addStage("menu", new StageMenu(this.stages, settings));
+		this.stages.addStage("play", new StagePlay(this.stages, settings));
 		this.stages.changeStage("play");
 
 	}
@@ -23,6 +23,7 @@ export default class App {
 
 			var gameLoop = () => {
 				requestAnimationFrame(gameLoop);
+				this.stages.beforeRender();
 				renderer.render(this.stages.current);
 			}
 			gameLoop();
