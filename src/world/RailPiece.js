@@ -23,4 +23,12 @@ export default class RailPiece {
 	isConnectedTo(railIndex) {
 		return this.to.indexOf(railIndex) >= 0;
 	}
+
+	getTo() {
+		return this.to[0];
+	}
+
+	getFrom() {
+		return this.from[0];
+	}
 }

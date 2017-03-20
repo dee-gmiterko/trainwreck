@@ -3,6 +3,7 @@ export default class Stages {
 	constructor() {
 		this.current = undefined;
 		this.list = [];
+		this.nextTick = 0;
 	}
 	
 	addStage(name, stage) {
@@ -25,7 +26,10 @@ export default class Stages {
 	}
 
 	beforeRender() {
-		this.current.tick();
+		if(this.nextTick <= Date.now()) {
+			this.nextTick = Date.now() + 10;
+			this.current.tick();
+		}
 	}
 }
 

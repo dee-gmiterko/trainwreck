@@ -12,14 +12,11 @@ export default class World extends PIXI.Container {
 		//init
 		var r0 = new RailPiece();
 		var r1 = new RailPiece();
-		var r2 = new RailPiece();
 		this.connectRails(r0, 0, r1, 0);
-		this.connectRails(r1, 0, r2, 0);
 		this.rails.push({0: r0});
 		this.rails.push({0: r1});
-		this.rails.push({0: r2});
 
-		for(var i=0; i<100; i++) {
+		for(var i=0; i<60; i++) {
 			this.generateNext((2 * Math.floor(Math.abs(Math.sin(i / 10)) * i / 7)) + 1);
 		}
 
@@ -42,7 +39,7 @@ export default class World extends PIXI.Container {
 
 		var railsBefore = this.rails[this.rails.length-2];
 		Object.keys(railsBefore).forEach(railIndex => {
-			railIndex = parseInt(railIndex);
+			railIndex = parseInt(railIndex, 10);
 
 			var usableGenerators = this.railGenerators.filter((railGenerator) => {
 				return railGenerator.canUse(railsBefore, rails, railIndex);
@@ -156,8 +153,8 @@ export default class World extends PIXI.Container {
 
 					this.displayRailPiece(railSprite, railPiece, railIndex);
 
-					railSprite.x = i * this.PIECE_WIDTH;
-					railSprite.y = railIndex * this.PIECE_HEIGHT;
+					railSprite.x = i * World.PIECE_WIDTH;
+					railSprite.y = railIndex * World.PIECE_HEIGHT;
 					// railSprite.anchor.x = 0.5;
 					// railSprite.anchor.y = 0.5;
 
@@ -168,18 +165,17 @@ export default class World extends PIXI.Container {
 	}
 
 	displayRailPiece(railSprite, railPiece, railIndex) {
-		railSprite.width = this.PIECE_WIDTH;
-		railSprite.height = this.PIECE_HEIGHT;
+		railSprite.width = World.PIECE_WIDTH;
+		railSprite.height = World.PIECE_HEIGHT;
 
 		railSprite.lineStyle(1, 0xFF0000);
-		railSprite.drawRect(1, 1, this.PIECE_WIDTH - 2, this.PIECE_HEIGHT - 2);
+		railSprite.drawRect(1, 1, World.PIECE_WIDTH - 2, World.PIECE_HEIGHT - 2);
 
 		for(var toRailIndex of railPiece.to) {
 			let h = toRailIndex - railIndex;
-			console.log(h);
 			railSprite.lineStyle(5, 0xffffff);
-			railSprite.moveTo(this.PIECE_WIDTH2, this.PIECE_HEIGHT2);
-			railSprite.lineTo(this.PIECE_WIDTH, this.PIECE_HEIGHT2 + h * this.PIECE_HEIGHT2);
+			railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
+			railSprite.lineTo(World.PIECE_WIDTH, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
 			railSprite.endFill();
 		}
 
@@ -187,14 +183,30 @@ export default class World extends PIXI.Container {
 			let h = fromRailIndex - railIndex;
 
 			railSprite.lineStyle(5, 0xffffff);
-			railSprite.moveTo(this.PIECE_WIDTH2, this.PIECE_HEIGHT2);
-			railSprite.lineTo(0, this.PIECE_HEIGHT2 + h * this.PIECE_HEIGHT2);
+			railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
+			railSprite.lineTo(0, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
 			railSprite.endFill();
 		}
+	}
+
+	getPath(railsOffset, railIndex, direction) {
+		var path = [];
+		path.push(railIndex);
+		while(railsOffset < this.rails.length) {
+			var railPiece = this.rails[railsOffset][railIndex];
+			var next = (direction === 1) ? railPiece.getTo() : railPiece.getFrom();
+			if(next === null) {
+				break;
+			}
+			path.push(next);
+			railIndex = next;
+			railsOffset += direction;
+		}
+		return path;
 	}
 }
 
 World.PIECE_WIDTH = 50;
 World.PIECE_HEIGHT = 20;
-World.PIECE_WIDTH2 = this.PIECE_WIDTH / 2;
-World.PIECE_HEIGHT2 = this.PIECE_HEIGHT / 2;
+World.PIECE_WIDTH2 = World.PIECE_WIDTH / 2;
+World.PIECE_HEIGHT2 = World.PIECE_HEIGHT / 2;

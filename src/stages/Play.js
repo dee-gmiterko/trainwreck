@@ -9,6 +9,7 @@ export default class StagePlay extends PIXI.Container {
 		
 		this.stages = stages;
 		this.settings = settings;
+		this.cameraPosPercentage = 0.21;
 	}
 
 	load() {
@@ -16,15 +17,29 @@ export default class StagePlay extends PIXI.Container {
 		this.world.y = this.settings.height / 2;
 
 		this.train = new Train(this.world, 0, 0, Train.RIGHT);
+		this.train.y = this.settings.height / 2;
 
 		this.switchCursor = new SwitchCursor(this.world);
 
 		this.addChild(this.world);
+		this.addChild(this.train);
 		this.addChild(this.switchCursor);
+
+		this.interactive=true;
+		this.on('mousedown', () => {
+			this.train.addCart();
+		});
 	}
 
 	tick() {
-		this.world.x -= 1;
+		this.train.move();
+
+		//move camera
+		if(this.train.children[0].x > this.cameraPosPercentage * this.settings.width) {
+			var camPos = this.cameraPosPercentage * this.settings.width - this.train.children[0].x;
+			this.world.x = camPos;
+			this.train.x = camPos;
+		}
 	}
 
 	unload() {
