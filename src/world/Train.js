@@ -15,7 +15,7 @@ export default class Train extends PIXI.Container {
 		this.locomotive.x = 0;
 		this.locomotive.y = 0;
 		
-		this.recalculatePath();
+		this.path = this.world.getPath(0, 0, this.direction);
 	}
 
 	move() {
@@ -93,13 +93,11 @@ export default class Train extends PIXI.Container {
 		this.removeChild(this.children[this.children.length-1]);
 	}
 
-	recalculatePath() {
-		if(this.path) {
-			var x = Math.floor(this.children[0].x / World.PIECE_WIDTH);
-			this.world.getPath(x, this.path[x], this.direction, this.path);
-		} else {
-			this.path = this.world.getPath(0, 0, this.direction);
+	recalculatePath(from) {
+		if(from === undefined) {
+			from = Math.floor(this.children[0].x / World.PIECE_WIDTH);
 		}
+		this.world.getPath(from, this.path[from], this.direction, this.path);
 	}
 }
 

@@ -16,13 +16,13 @@ export default class RailPiece {
 
 	addTo(railIndex) {
 		this.to.push(railIndex);
-		this.to.sort();
+		this.to.sort((a, b) => {return a-b;});
 		this.onRailAdded();
 	}
 
 	addFrom(railIndex) {
 		this.from.push(railIndex);
-		this.from.sort();
+		this.from.sort((a, b) => {return a-b;});
 		this.onRailAdded();
 	}
 

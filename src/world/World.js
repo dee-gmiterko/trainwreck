@@ -190,11 +190,13 @@ export default class World extends PIXI.Container {
 		railSprite.width = World.PIECE_WIDTH;
 		railSprite.height = World.PIECE_HEIGHT;
 
+		var h;
+
 		// railSprite.lineStyle(1, 0xFF0000);
 		// railSprite.drawRect(1, 1, World.PIECE_WIDTH - 2, World.PIECE_HEIGHT - 2);
 
 		for(var toRailIndex of railPiece.to) {
-			let h = toRailIndex - railIndex;
+			h = toRailIndex - railIndex;
 			railSprite.lineStyle(5, 0xffffff, 0.5);
 			railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
 			railSprite.lineTo(World.PIECE_WIDTH, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
@@ -202,13 +204,24 @@ export default class World extends PIXI.Container {
 		}
 
 		for(var fromRailIndex of railPiece.from) {
-			let h = fromRailIndex - railIndex;
-
+			h = fromRailIndex - railIndex;
 			railSprite.lineStyle(5, 0xffffff, 0.5);
 			railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
 			railSprite.lineTo(0, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
 			railSprite.endFill();
 		}
+
+		// h = railPiece.getTo() - railIndex;
+		// railSprite.lineStyle(2, 0xff0000, 0.4);
+		// railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
+		// railSprite.lineTo(World.PIECE_WIDTH - World.PIECE_WIDTH2, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
+		// railSprite.endFill();
+
+		// h = railPiece.getFrom() - railIndex;
+		// railSprite.lineStyle(2, 0xffffff, 0.4);
+		// railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
+		// railSprite.lineTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
+		// railSprite.endFill();
 	}
 
 	getPath(railsOffset, railIndex, direction, path) {

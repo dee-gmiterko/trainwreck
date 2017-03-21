@@ -10,6 +10,7 @@ export default class SwitchCursor extends PIXI.Container {
 		this.cursorY = 0;
 
 		this.display();
+		this.displayPath();
 
 		this.recalculatePosition();
 	}
@@ -29,8 +30,8 @@ export default class SwitchCursor extends PIXI.Container {
 			this.cursorX = newCursorX;
 			this.cursorY = this.train.path[newCursorX];
 
-			this.children[0].x = this.cursorX * World.PIECE_WIDTH + World.PIECE_WIDTH2;
-			this.children[0].y = this.cursorY * World.PIECE_HEIGHT + World.PIECE_HEIGHT2;
+			this.cursor.x = this.cursorX * World.PIECE_WIDTH + World.PIECE_WIDTH2;
+			this.cursor.y = this.cursorY * World.PIECE_HEIGHT + World.PIECE_HEIGHT2;
 		}
 	}
 
@@ -42,12 +43,29 @@ export default class SwitchCursor extends PIXI.Container {
 		cursor.lineStyle(SwitchCursor.WIDTH, 0xff0000, 0.8);
 		cursor.drawEllipse(0, 0, SwitchCursor.SIZE, SwitchCursor.SIZE);
 
+		this.cursor = cursor;
 		this.addChild(cursor);
 	}
 
+	displayPath() {
+		if(this.path) {
+			this.removeChild(this.path);
+		}
+		var path = new PIXI.Graphics();
+		
+		path.lineStyle(SwitchCursor.WIDTH, 0xffff00, 0.5);
+		path.moveTo(0, 0);
+		for (var i=0; i < this.train.path.length; i++) {
+			path.lineTo(World.PIECE_WIDTH * i + World.PIECE_WIDTH2, World.PIECE_HEIGHT * this.train.path[i] + World.PIECE_HEIGHT2);
+		}
+		path.endFill();
+
+		this.path = path;
+		this.addChild(path);
+	}
+
 	switchCursor(value) {
-		if(this.cursorX && this.cursorY) {
-			console.log("switching", this.cursorX, this.cursorY);
+		if(this.cursorX !== undefined && this.cursorY !== undefined) {
 			var railPiece = this.train.world.rails[this.cursorX][this.cursorY];
 
 			var oldTo = railPiece.getTo();
@@ -56,7 +74,8 @@ export default class SwitchCursor extends PIXI.Container {
 			railPiece.switchPrefered(this.train.direction, value);
 			
 			if(oldTo != railPiece.getTo() || oldFrom != railPiece.getFrom()) {
-				this.train.recalculatePath();
+				this.train.recalculatePath(this.cursorX);
+				this.displayPath();
 			}
 		}
 	}
