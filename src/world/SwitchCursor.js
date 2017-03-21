@@ -21,8 +21,7 @@ export default class SwitchCursor extends PIXI.Container {
 		if(this.cursorX === trainX && this.cursorY === trainY) {
 			//find next switch
 			var newCursorX = trainX + 1;
-			console.log(this.train.world.rails[newCursorX][this.train.path[newCursorX]].isSwitch);
-			while(!this.train.world.rails[newCursorX][this.train.path[newCursorX]].isSwitch) {
+			while(this.train.world.rails[newCursorX][this.train.path[newCursorX]].to.length < 2) {
 				newCursorX++;
 				if(newCursorX > this.train.world.rails.length) {
 					break;
