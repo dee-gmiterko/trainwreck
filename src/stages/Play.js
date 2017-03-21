@@ -1,6 +1,7 @@
 import World from '../world/World';
 import Train from '../world/Train';
 import SwitchCursor from '../world/SwitchCursor';
+import KeyListener from '../common/KeyListener';
 
 export default class StagePlay extends PIXI.Container {
 
@@ -27,10 +28,10 @@ export default class StagePlay extends PIXI.Container {
 		this.addChild(this.train);
 		this.addChild(this.switchCursor);
 
-		this.interactive=true;
-		this.on('mousedown', () => {
-			this.train.addCart();
-		});
+		this.keyUp = new KeyListener(38);
+		this.keyDown = new KeyListener(40);
+		this.keyLeft = new KeyListener(37);
+		this.keyRight = new KeyListener(39);
 	}
 
 	tick() {
@@ -44,13 +45,38 @@ export default class StagePlay extends PIXI.Container {
 			this.train.x = camPos + World.PIECE_WIDTH2;
 			this.switchCursor.x = camPos;
 		}
+
+		if(this.keyUp.isDown) {
+			this.switchCursor.switchCursor(0);
+		}
+		if(this.keyDown.isDown) {
+			this.switchCursor.switchCursor(1);
+		}
+		if(this.keyLeft.isDown) {
+			this.train.speed -= 0.1;
+		}
+		if(this.keyRight.isDown) {
+			this.train.speed += 0.1;
+		}
 	}
 
 	unload() {
 		this.removeChild(this.world);
+		this.removeChild(this.train);
 		this.removeChild(this.switchCursor);
 		
+		this.keyUp.close();
+		this.keyDown.close();
+		this.keyLeft.close();
+		this.keyRight.close();
+
+		this.keyUp = undefined;
+		this.keyDown = undefined;
+		this.keyLeft = undefined;
+		this.keyRight = undefined;
+
 		this.world = undefined;
+		this.train = undefined;
 		this.switchCursor = undefined;
 	}
 }

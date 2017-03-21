@@ -21,11 +21,10 @@ export default class SwitchCursor extends PIXI.Container {
 		if(this.cursorX === trainX && this.cursorY === trainY) {
 			//find next switch
 			var newCursorX = trainX + 1;
-			while(this.train.world.rails[newCursorX][this.train.path[newCursorX]].to.length < 2) {
+			while(newCursorX < this.train.world.rails.length
+				&& newCursorX < this.train.path.length
+				&& this.train.world.rails[newCursorX][this.train.path[newCursorX]].to.length < 2) {
 				newCursorX++;
-				if(newCursorX > this.train.world.rails.length) {
-					break;
-				}
 			}
 			this.cursorX = newCursorX;
 			this.cursorY = this.train.path[newCursorX];
@@ -44,6 +43,22 @@ export default class SwitchCursor extends PIXI.Container {
 		cursor.drawEllipse(0, 0, SwitchCursor.SIZE, SwitchCursor.SIZE);
 
 		this.addChild(cursor);
+	}
+
+	switchCursor(value) {
+		if(this.cursorX && this.cursorY) {
+			console.log("switching", this.cursorX, this.cursorY);
+			var railPiece = this.train.world.rails[this.cursorX][this.cursorY];
+
+			var oldTo = railPiece.getTo();
+			var oldFrom = railPiece.getFrom();
+			
+			railPiece.switchPrefered(this.train.direction, value);
+			
+			if(oldTo != railPiece.getTo() || oldFrom != railPiece.getFrom()) {
+				this.train.recalculatePath();
+			}
+		}
 	}
 }
 

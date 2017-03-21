@@ -16,7 +16,7 @@ export default class World extends PIXI.Container {
 		this.rails.push({0: r0});
 		this.rails.push({0: r1});
 
-		for(var i=0; i<60; i++) {
+		for(var i=0; i<100; i++) {
 			this.generateNext((2 * Math.floor(Math.abs(Math.sin(i / 10)) * i / 7)) + 1);
 		}
 
@@ -123,6 +123,7 @@ export default class World extends PIXI.Container {
 			}
 		}, 1);
 
+/*
 		//backsplit up
 		addRailType({
 			canUse: (railsBefore, rails, railIndex) => {
@@ -154,6 +155,7 @@ export default class World extends PIXI.Container {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
 			}
 		}, 1);
+*/
 	}
 
 	display() {
@@ -193,7 +195,7 @@ export default class World extends PIXI.Container {
 
 		for(var toRailIndex of railPiece.to) {
 			let h = toRailIndex - railIndex;
-			railSprite.lineStyle(5, 0xffffff);
+			railSprite.lineStyle(5, 0xffffff, 0.5);
 			railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
 			railSprite.lineTo(World.PIECE_WIDTH, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
 			railSprite.endFill();
@@ -202,25 +204,34 @@ export default class World extends PIXI.Container {
 		for(var fromRailIndex of railPiece.from) {
 			let h = fromRailIndex - railIndex;
 
-			railSprite.lineStyle(5, 0xffffff);
+			railSprite.lineStyle(5, 0xffffff, 0.5);
 			railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
 			railSprite.lineTo(0, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
 			railSprite.endFill();
 		}
 	}
 
-	getPath(railsOffset, railIndex, direction) {
-		var path = [];
-		path.push(railIndex);
+	getPath(railsOffset, railIndex, direction, path) {
+		if(!path) {
+			path = [];
+		}
+		path[railsOffset] = railIndex;
 		while(railsOffset < this.rails.length) {
 			var railPiece = this.rails[railsOffset][railIndex];
 			var next = (direction === 1) ? railPiece.getTo() : railPiece.getFrom();
-			if(next === null) {
-				break;
+			
+			if(next === undefined) {
+				break; //EOW
 			}
-			path.push(next);
-			railIndex = next;
+			
 			railsOffset += direction;
+			
+			if(path[railsOffset] === next) {
+				break; //already same path
+			}
+			
+			path[railsOffset] = next;
+			railIndex = next;
 		}
 		return path;
 	}

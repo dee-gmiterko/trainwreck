@@ -96,7 +96,7 @@ export default class Train extends PIXI.Container {
 	recalculatePath() {
 		if(this.path) {
 			var x = Math.floor(this.children[0].x / World.PIECE_WIDTH);
-			this.path = this.world.getPath(x, this.path[x], this.direction);
+			this.world.getPath(x, this.path[x], this.direction, this.path);
 		} else {
 			this.path = this.world.getPath(0, 0, this.direction);
 		}

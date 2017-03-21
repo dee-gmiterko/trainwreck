@@ -1,3 +1,5 @@
+import Train from './Train';
+
 export default class RailPiece {
 
 	constructor() {
@@ -30,7 +32,7 @@ export default class RailPiece {
 		if(this.isSwitch) {
 			this.switched = {
 				from: Math.floor(Math.random() * this.from.length),
-				to: Math.floor(Math.random() * this.from.length)
+				to: Math.floor(Math.random() * this.to.length)
 			}
 		}
 	}
@@ -43,28 +45,34 @@ export default class RailPiece {
 		if(this.isSwitch) {
 			return this.to[this.switched.to];
 		}
-		return this.to[0];
+		if(this.to.length > 0) {
+			return this.to[0];
+		}
+		return undefined;
 	}
 
 	getFrom() {
 		if(this.isSwitch) {
 			return this.from[this.switched.from];
 		}
-		return this.from[0];
+		if(this.from.length > 0) {
+			return this.from[0];
+		}
+		return undefined;
 	}
 
 	switchPrefered(preferedDirection, value) {
 		if(preferedDirection == Train.RIGHT) {
 			if(this.to.length >= 2) {
-				toggleSwitchTo(value);
+				this.switchTo(value);
 			} else {
-				toggleSwitchFrom(value);
+				this.switchFrom(value);
 			}
 		} else {
 			if(this.from.length >= 2) {
-				toggleSwitchFrom(value);
+				this.switchFrom(value);
 			} else {
-				toggleSwitchTo(value);
+				this.switchTo(value);
 			}
 		}
 	}
