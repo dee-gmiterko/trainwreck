@@ -1,4 +1,5 @@
 import RailPiece from './RailPiece';
+import Train from './Train';
 
 export default class World extends PIXI.Container {
 
@@ -37,6 +38,7 @@ export default class World extends PIXI.Container {
 		}
 		this.rails.push(rails);
 
+		//rails
 		var railsBefore = this.rails[this.rails.length-2];
 		Object.keys(railsBefore).forEach(railIndex => {
 			railIndex = parseInt(railIndex, 10);
@@ -48,6 +50,16 @@ export default class World extends PIXI.Container {
 			if(usableGenerators.length > 0) {
 				var railGenerator = usableGenerators[Math.floor(Math.random() * usableGenerators.length)];
 				railGenerator.use(railsBefore, rails, railIndex);
+			}
+		});
+
+		//carts
+		Object.keys(rails).forEach(railIndex => {
+			railIndex = parseInt(railIndex, 10);
+			var railPiece = rails[railIndex];
+
+			if(Math.random() < 0.05) {
+				railPiece.isCart = true;
 			}
 		});
 	}
@@ -173,12 +185,12 @@ export default class World extends PIXI.Container {
 				if(!railPiece.isEmpty) {
 					var railSprite = new PIXI.Graphics();
 
-					this.displayRailPiece(railSprite, railPiece, railIndex);
-
 					railSprite.x = i * World.PIECE_WIDTH;
 					railSprite.y = railIndex * World.PIECE_HEIGHT;
-					// railSprite.anchor.x = 0.5;
-					// railSprite.anchor.y = 0.5;
+					railSprite.width = World.PIECE_WIDTH;
+					railSprite.height = World.PIECE_HEIGHT;
+					
+					this.displayRailPiece(railSprite, railPiece, railIndex);
 
 					this.addChild(railSprite);
 				}
@@ -187,8 +199,7 @@ export default class World extends PIXI.Container {
 	}
 
 	displayRailPiece(railSprite, railPiece, railIndex) {
-		railSprite.width = World.PIECE_WIDTH;
-		railSprite.height = World.PIECE_HEIGHT;
+		railSprite.clear();
 
 		var h;
 
@@ -211,17 +222,21 @@ export default class World extends PIXI.Container {
 			railSprite.endFill();
 		}
 
-		// h = railPiece.getTo() - railIndex;
-		// railSprite.lineStyle(2, 0xff0000, 0.4);
-		// railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
-		// railSprite.lineTo(World.PIECE_WIDTH - World.PIECE_WIDTH2, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
-		// railSprite.endFill();
+		if(railPiece.isCart) {
+			railSprite.beginFill(0xFFFF00);
+			railSprite.lineStyle();
+			railSprite.drawRect(World.PIECE_WIDTH2 - Train.CART_WIDTH2, World.PIECE_HEIGHT2 - Train.CART_HEIGHT2, Train.CART_WIDTH, Train.CART_HEIGHT);
+		}
+	}
 
-		// h = railPiece.getFrom() - railIndex;
-		// railSprite.lineStyle(2, 0xffffff, 0.4);
-		// railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
-		// railSprite.lineTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
-		// railSprite.endFill();
+	updateRailPiece(railsOffset, railIndex) {
+		var x = railsOffset * World.PIECE_WIDTH;
+		var y = railIndex * World.PIECE_HEIGHT;
+		for(var i=0; i<this.children.length; i++) {
+			if(this.children[i].x == x && this.children[i].y == y) {
+				this.displayRailPiece(this.children[i], this.rails[railsOffset][railIndex], railIndex);
+			}
+		}
 	}
 
 	getPath(railsOffset, railIndex, direction, path) {

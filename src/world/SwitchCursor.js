@@ -54,7 +54,7 @@ export default class SwitchCursor extends PIXI.Container {
 		var path = new PIXI.Graphics();
 		
 		path.lineStyle(SwitchCursor.WIDTH, 0xffff00, 0.5);
-		path.moveTo(0, 0);
+		path.moveTo(World.PIECE_WIDTH, World.PIECE_HEIGHT2);
 		for (var i=0; i < this.train.path.length; i++) {
 			path.lineTo(World.PIECE_WIDTH * i + World.PIECE_WIDTH2, World.PIECE_HEIGHT * this.train.path[i] + World.PIECE_HEIGHT2);
 		}

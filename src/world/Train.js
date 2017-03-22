@@ -36,6 +36,15 @@ export default class Train extends PIXI.Container {
 		this.locomotive.y = getY(this.locomotive.x);
 		this.locomotive.rotation = getAngle(this.locomotive.x);
 		
+		//check for cart on rail
+		var x = Math.floor(this.locomotive.x / World.PIECE_WIDTH);
+		var y = this.path[x];
+		if(y !== undefined && this.world.rails[x][y].isCart) {
+			this.addCart();
+			this.world.rails[x][y].isCart = false;
+			this.world.updateRailPiece(x, y);
+		}
+
 		//move other carts
 		for(var i = 1; i < this.children.length; i++) {
 			var dx = this.children[i].x - this.children[i-1].x;
