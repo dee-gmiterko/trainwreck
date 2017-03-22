@@ -7,7 +7,7 @@ export default class Train extends PIXI.Container {
 
 		this.world = world;
 		this.direction = direction;
-		this.speed = 1;
+		this.speed = Train.INITIAL_SPEED;
 
 		this.addCart();
 
@@ -108,6 +108,10 @@ export default class Train extends PIXI.Container {
 		}
 		this.world.getPath(from, this.path[from], this.direction, this.path);
 	}
+
+	getCartCount() {
+		return this.children.length;
+	}
 }
 
 Train.LEFT = -1;
@@ -119,3 +123,5 @@ Train.CART_WIDTH2 = Train.CART_WIDTH / 2;
 Train.CART_HEIGHT2 = Train.CART_HEIGHT / 2;
 Train.CART_DELAY = 32;
 Train.CART_MAX_SKEW = Train.CART_HEIGHT / 3;
+Train.INITIAL_SPEED = 0.4;
+Train.SPEED_CHANGE_STEP = 0.05;

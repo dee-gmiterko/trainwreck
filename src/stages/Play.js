@@ -24,9 +24,14 @@ export default class StagePlay extends PIXI.Container {
 		this.switchCursor = new SwitchCursor(this.train);
 		this.switchCursor.y = this.settings.height / 2;
 
+		this.cartsText = new PIXI.Text("0", new PIXI.TextStyle({fontSize: 40, fill: '#FFFFFF'}));
+		this.cartsText.x = 16;
+		this.cartsText.y = 16;
+
 		this.addChild(this.world);
 		this.addChild(this.train);
 		this.addChild(this.switchCursor);
+		this.addChild(this.cartsText);
 
 		this.keyUp = new KeyListener(38);
 		this.keyDown = new KeyListener(40);
@@ -53,11 +58,13 @@ export default class StagePlay extends PIXI.Container {
 			this.switchCursor.switchCursor(1);
 		}
 		if(this.keyLeft.isDown) {
-			this.train.speed -= 0.1;
+			this.train.speed -= Train.SPEED_CHANGE_STEP;
 		}
 		if(this.keyRight.isDown) {
-			this.train.speed += 0.1;
+			this.train.speed += Train.SPEED_CHANGE_STEP;
 		}
+
+		this.cartsText.text = this.train.getCartCount();
 	}
 
 	unload() {
