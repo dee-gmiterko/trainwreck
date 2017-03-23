@@ -19,7 +19,7 @@ export default class SwitchCursor extends PIXI.Container {
 		var trainX = Math.floor(this.train.locomotive.x / World.PIECE_WIDTH);
 		var trainY = this.train.path[trainX];
 
-		if(this.cursorX === trainX && this.cursorY === trainY) {
+		// if(this.cursorX === trainX && this.cursorY === trainY) {
 			//find next switch
 			var newCursorX = trainX + 1;
 			while(newCursorX < this.train.world.rails.length
@@ -27,12 +27,13 @@ export default class SwitchCursor extends PIXI.Container {
 				&& this.train.world.rails[newCursorX][this.train.path[newCursorX]].to.length < 2) {
 				newCursorX++;
 			}
+			console.log(newCursorX);
 			this.cursorX = newCursorX;
 			this.cursorY = this.train.path[newCursorX];
 
 			this.cursor.x = this.cursorX * World.PIECE_WIDTH + World.PIECE_WIDTH2;
 			this.cursor.y = this.cursorY * World.PIECE_HEIGHT + World.PIECE_HEIGHT2;
-		}
+		// }
 	}
 
 	display() {

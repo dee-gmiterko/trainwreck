@@ -11,17 +11,14 @@ export default class World extends PIXI.Container {
 		this.initGenarator();
 
 		//init
-		var r0 = new RailPiece();
-		var r1 = new RailPiece();
-		this.connectRails(r0, 0, r1, 0);
-		this.rails.push({0: r0});
-		this.rails.push({0: r1});
+		this.rails.push({0: new RailPiece()});
 
-		for(var i=0; i<100; i++) {
-			this.generateNext((2 * Math.floor(Math.abs(Math.sin(i / 10)) * i / 7)) + 1);
-		}
+		this.displayed = {
+			from: 0,
+			to: 0
+		};
 
-		this.display();
+		// this.clamp(0, 60);
 	}
 
 	connectRails(railA, indexA, railB, indexB) {
@@ -62,6 +59,13 @@ export default class World extends PIXI.Container {
 				railPiece.isCart = true;
 			}
 		});
+	}
+
+	clamp(from, to) {
+		for(var i=this.displayed.to; i<to; i++) {
+			this.generateNext(Math.min(7, (2 * Math.floor(Math.abs(Math.sin(i / 10)) * i / 7)) + 1));
+		}
+		this.display(from, to);
 	}
 
 	initGenarator() {
@@ -170,14 +174,25 @@ export default class World extends PIXI.Container {
 */
 	}
 
-	display() {
-		//clear
+	display(from, to) {
+		if(from === undefined) {
+			from = 0;
+		}
+		if(to === undefined) {
+			to = this.rails.length;
+		}
+
+		//remove before from
+		var removeFrom = World.PIECE_WIDTH * this.displayed.from;
+		var removeTo = World.PIECE_WIDTH * from;
 		for (var i = this.children.length - 1; i >= 0; i--) {
-			this.removeChild(this.children[i]);
+			if(this.children[i].x >= removeFrom || this.children[i].x < removeTo) {
+				this.removeChild(this.children[i]);
+			}
 		}
 
 		//add rails
-		for(i=0; i<this.rails.length; i++) {
+		for(i=this.displayed.to; i<to; i++) {
 			var rails = this.rails[i];
 			for(var railIndex in rails) {
 				var railPiece = rails[railIndex];
@@ -196,6 +211,9 @@ export default class World extends PIXI.Container {
 				}
 			}
 		}
+
+		this.displayed.from = from
+		this.displayed.to = to;
 	}
 
 	displayRailPiece(railSprite, railPiece, railIndex) {
@@ -203,8 +221,8 @@ export default class World extends PIXI.Container {
 
 		var h;
 
-		// railSprite.lineStyle(1, 0xFF0000);
-		// railSprite.drawRect(1, 1, World.PIECE_WIDTH - 2, World.PIECE_HEIGHT - 2);
+		railSprite.lineStyle(1, 0xFF0000);
+		railSprite.drawRect(1, 1, World.PIECE_WIDTH - 2, World.PIECE_HEIGHT - 2);
 
 		for(var toRailIndex of railPiece.to) {
 			h = toRailIndex - railIndex;

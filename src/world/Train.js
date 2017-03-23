@@ -32,7 +32,6 @@ export default class Train extends PIXI.Container {
 				var y1 = World.PIECE_HEIGHT * this.path[Math.floor(x / World.PIECE_WIDTH)];
 				var y2 = World.PIECE_HEIGHT * this.path[Math.floor(x / World.PIECE_WIDTH) + 1];
 				if(Object.is(y2, NaN)) {
-					console.log(y1);
 					y2 = y1;
 				}
 				var t = (x % World.PIECE_WIDTH) / World.PIECE_WIDTH;
@@ -83,7 +82,7 @@ export default class Train extends PIXI.Container {
 			this.isCrashed = true;
 
 			//move locomotive
-			this.speed *= 0.96;
+			this.speed *= 0.92;
 			this.locomotive.rotation += Math.min(3, this.speed) * (Math.random() - 0.5) * 0.2;
 			this.locomotive.x += this.speed * Math.cos(this.locomotive.rotation);
 			this.locomotive.y += this.speed * Math.sin(this.locomotive.rotation);

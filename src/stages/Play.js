@@ -49,11 +49,19 @@ export default class StagePlay extends PIXI.Container {
 	}
 
 	tick() {
+		if(this.train.locomotive.x + this.settings.width > this.world.displayed.to * World.PIECE_WIDTH) {
+			var from = Math.floor(this.train.locomotive.x / World.PIECE_WIDTH);
+			var oldTo = this.world.displayed.to;
+			this.world.clamp(from, from + 100);
+			this.train.recalculatePath(oldTo);
+			this.switchCursor.displayPath();
+		}
+
 		this.train.move();
 		this.switchCursor.recalculatePosition();
 
 		//move camera
-		var camPos = this.cameraPosPercentage * this.settings.width - this.train.children[0].x;
+		var camPos = this.cameraPosPercentage * this.settings.width - this.train.locomotive.x;
 		if(camPos > 0) {
 			camPos = 0;
 		}
