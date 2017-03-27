@@ -221,9 +221,6 @@ export default class World extends PIXI.Container {
 
 		var h;
 
-		railSprite.lineStyle(1, 0xFF0000);
-		railSprite.drawRect(1, 1, World.PIECE_WIDTH - 2, World.PIECE_HEIGHT - 2);
-
 		for(var toRailIndex of railPiece.to) {
 			h = toRailIndex - railIndex;
 			railSprite.lineStyle(5, 0xffffff, 0.5);

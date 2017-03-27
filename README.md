@@ -1,13 +1,2 @@
-## mqMove
-Multiplayer game prototype using questions from learning system to move.
-
-## How to run
-Start server to handle multiplayer communication / webserver with game
-```
-$ npm run server
-```
-
-Start development enviroment
-```
-$ npm start
-```
+## Trainwreck
+Game about controling trains in realy weird resolution 960*144. Made for [960*144 game jam](https://itch.io/jam/960144).
