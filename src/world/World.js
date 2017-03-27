@@ -85,7 +85,7 @@ export default class World extends PIXI.Container {
 			use: (railsBefore, rails, railIndex) => {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
 			}
-		}, 6);
+		}, 8);
 
 		//up
 		addRailType({
@@ -121,7 +121,7 @@ export default class World extends PIXI.Container {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex + 1], railIndex + 1);
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
 			}
-		}, 1);
+		}, 3);
 
 		//split down
 		addRailType({
@@ -137,7 +137,7 @@ export default class World extends PIXI.Container {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex - 1], railIndex - 1);
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
 			}
-		}, 1);
+		}, 3);
 
 /*
 		//backsplit up
@@ -154,7 +154,7 @@ export default class World extends PIXI.Container {
 				this.connectRails(railsBefore[railIndex + 1], railIndex + 1, rails[railIndex], railIndex);
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
 			}
-		}, 1);
+		}, 2);
 
 		//backsplit down
 		addRailType({
@@ -170,7 +170,7 @@ export default class World extends PIXI.Container {
 				this.connectRails(railsBefore[railIndex - 1], railIndex - 1, rails[railIndex], railIndex);
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
 			}
-		}, 1);
+		}, 2);
 */
 	}
 

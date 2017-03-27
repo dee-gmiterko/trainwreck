@@ -14,6 +14,8 @@ export default class StagePlay extends PIXI.Container {
 	}
 
 	load() {
+		this.camOffset = this.cameraPosPercentage * this.settings.width;
+
 		this.world = new World();
 		this.world.y = this.settings.height / 2;
 
@@ -61,7 +63,10 @@ export default class StagePlay extends PIXI.Container {
 		this.switchCursor.recalculatePosition();
 
 		//move camera
-		var camPos = this.cameraPosPercentage * this.settings.width - this.train.locomotive.x;
+		var camPos = this.camOffset - this.train.locomotive.x;
+		if(this.train.isCrashed) {
+			this.camOffset += 0.8;
+		}
 		if(camPos > 0) {
 			camPos = 0;
 		}
@@ -83,9 +88,9 @@ export default class StagePlay extends PIXI.Container {
 			if(this.keyRight.isDown) {
 				this.train.speed += Train.SPEED_CHANGE_STEP;
 			}
-			if(this.keySpace.isDown) {
-				this.restart();
-			}
+		}
+		if(this.keySpace.isDown) {
+			this.restart();
 		}
 
 		this.cartsText.text = this.train.getCartCount();
