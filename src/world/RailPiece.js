@@ -62,7 +62,7 @@ export default class RailPiece {
 	}
 
 	switchPrefered(preferedDirection, value) {
-		if(preferedDirection == Train.RIGHT) {
+		if(preferedDirection === Train.RIGHT) {
 			if(this.to.length >= 2) {
 				this.switchTo(value);
 			} else {

@@ -18,7 +18,12 @@ export default class World extends PIXI.Container {
 			to: 0
 		};
 
-		// this.clamp(0, 60);
+		this.generated = {
+			from: 0,
+			to: 0
+		};
+
+		this.clamp(0, 60);
 	}
 
 	connectRails(railA, indexA, railB, indexB) {
@@ -62,9 +67,12 @@ export default class World extends PIXI.Container {
 	}
 
 	clamp(from, to) {
-		for(var i=this.displayed.to; i<to; i++) {
+		
+		for(var i=this.generated.to; i<to; i++) {
 			this.generateNext(Math.min(7, (2 * Math.floor(Math.abs(Math.sin(i / 10)) * i / 7)) + 1));
 		}
+		this.generated.to = to;
+
 		this.display(from, to);
 	}
 
@@ -111,35 +119,35 @@ export default class World extends PIXI.Container {
 		addRailType({
 			canUse: (railsBefore, rails, railIndex) => {
 				return rails[railIndex] !== undefined
-					&& rails[railIndex + 1] !== undefined
+				&& rails[railIndex + 1] !== undefined
 					//max one switch
 					&& rails[railIndex + 1].railsCount() <= 2
 					&& rails[railIndex].railsCount() <= 2
 					&& railsBefore[railIndex].railsCount() <= 2;
-			},
-			use: (railsBefore, rails, railIndex) => {
-				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex + 1], railIndex + 1);
-				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
-			}
-		}, 3);
+				},
+				use: (railsBefore, rails, railIndex) => {
+					this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex + 1], railIndex + 1);
+					this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
+				}
+			}, 3);
 
 		//split down
 		addRailType({
 			canUse: (railsBefore, rails, railIndex) => {
 				return rails[railIndex] !== undefined
-					&& rails[railIndex - 1] !== undefined
+				&& rails[railIndex - 1] !== undefined
 					//max one switch
 					&& rails[railIndex - 1].railsCount() <= 2
 					&& rails[railIndex].railsCount() <= 2
 					&& railsBefore[railIndex].railsCount() <= 2;
-			},
-			use: (railsBefore, rails, railIndex) => {
-				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex - 1], railIndex - 1);
-				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
-			}
-		}, 3);
+				},
+				use: (railsBefore, rails, railIndex) => {
+					this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex - 1], railIndex - 1);
+					this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
+				}
+			}, 3);
 
-/*
+	/*
 		//backsplit up
 		addRailType({
 			canUse: (railsBefore, rails, railIndex) => {
@@ -171,7 +179,7 @@ export default class World extends PIXI.Container {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
 			}
 		}, 2);
-*/
+	*/
 	}
 
 	display(from, to) {
@@ -183,33 +191,41 @@ export default class World extends PIXI.Container {
 		}
 
 		//remove before from
-		var removeFrom = World.PIECE_WIDTH * this.displayed.from;
-		var removeTo = World.PIECE_WIDTH * from;
+		var worldFrom = World.PIECE_WIDTH * from;
+		var worldTo = World.PIECE_WIDTH * to;
 		for (var i = this.children.length - 1; i >= 0; i--) {
-			if(this.children[i].x >= removeFrom || this.children[i].x < removeTo) {
+			if(this.children[i].x < worldFrom || this.children[i].x > worldTo) {
 				this.removeChild(this.children[i]);
+			}
+		}
+
+		var displayRailsColumn = (rails) => {
+			for(var railIndex in rails) {
+				if(!isNaN(parseInt(railIndex, 10))) {
+					var railPiece = rails[railIndex];
+
+					if(!railPiece.isEmpty) {
+						var railSprite = new PIXI.Graphics();
+
+						railSprite.x = i * World.PIECE_WIDTH;
+						railSprite.y = railIndex * World.PIECE_HEIGHT;
+						railSprite.width = World.PIECE_WIDTH;
+						railSprite.height = World.PIECE_HEIGHT;
+
+						this.displayRailPiece(railSprite, railPiece, railIndex);
+
+						this.addChild(railSprite);
+					}
+				}
 			}
 		}
 
 		//add rails
 		for(i=this.displayed.to; i<to; i++) {
-			var rails = this.rails[i];
-			for(var railIndex in rails) {
-				var railPiece = rails[railIndex];
-
-				if(!railPiece.isEmpty) {
-					var railSprite = new PIXI.Graphics();
-
-					railSprite.x = i * World.PIECE_WIDTH;
-					railSprite.y = railIndex * World.PIECE_HEIGHT;
-					railSprite.width = World.PIECE_WIDTH;
-					railSprite.height = World.PIECE_HEIGHT;
-					
-					this.displayRailPiece(railSprite, railPiece, railIndex);
-
-					this.addChild(railSprite);
-				}
-			}
+			displayRailsColumn(this.rails[i]);
+		}
+		for(i=from; i<this.displayed.from; i++) {
+			displayRailsColumn(this.rails[i]);
 		}
 
 		this.displayed.from = from
@@ -248,7 +264,7 @@ export default class World extends PIXI.Container {
 		var x = railsOffset * World.PIECE_WIDTH;
 		var y = railIndex * World.PIECE_HEIGHT;
 		for(var i=0; i<this.children.length; i++) {
-			if(this.children[i].x == x && this.children[i].y == y) {
+			if(this.children[i].x === x && this.children[i].y === y) {
 				this.displayRailPiece(this.children[i], this.rails[railsOffset][railIndex], railIndex);
 			}
 		}
@@ -261,6 +277,10 @@ export default class World extends PIXI.Container {
 		path[railsOffset] = railIndex;
 		while(railsOffset < this.rails.length) {
 			var railPiece = this.rails[railsOffset][railIndex];
+			if(!railPiece) {
+				console.log("Wrong path!", railsOffset, railIndex);
+				break;
+			}
 			var next = (direction === 1) ? railPiece.getTo() : railPiece.getFrom();
 			
 			if(next === undefined) {

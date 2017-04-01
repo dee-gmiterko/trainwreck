@@ -51,30 +51,42 @@ export default class StagePlay extends PIXI.Container {
 	}
 
 	tick() {
-		if(this.train.locomotive.x + this.settings.width > this.world.displayed.to * World.PIECE_WIDTH) {
-			var from = Math.floor(this.train.locomotive.x / World.PIECE_WIDTH);
-			var oldTo = this.world.displayed.to;
-			this.world.clamp(from, from + 100);
-			this.train.recalculatePath(oldTo);
-			this.switchCursor.displayPath();
+		this.train.move();
+		
+		if(!this.train.isCrashed) {
+			this.switchCursor.recalculatePosition();
 		}
 
-		this.train.move();
-		this.switchCursor.recalculatePosition();
-
 		//move camera
-		var camPos = this.camOffset - this.train.locomotive.x;
+		var camPos = this.train.locomotive.x - this.camOffset;
 		if(this.train.isCrashed) {
 			this.camOffset += 0.8;
 		}
-		if(camPos > 0) {
+		if(camPos < 0) {
 			camPos = 0;
 		}
-		camPos -= World.PIECE_WIDTH;
-		this.world.x = camPos;
-		this.train.x = camPos + World.PIECE_WIDTH2;
-		this.switchCursor.x = camPos;
+		camPos += World.PIECE_WIDTH;
+		this.world.x = -camPos;
+		this.train.x = -camPos + World.PIECE_WIDTH2;
+		this.switchCursor.x = -camPos;
 		
+		//show/hide world
+		var c1 = camPos + this.settings.width + 5 * World.PIECE_WIDTH;
+		var c2 = camPos - 10 * World.PIECE_WIDTH;
+		if(c1 > this.world.displayed.to * World.PIECE_WIDTH || c2 < this.world.displayed.from * World.PIECE_WIDTH) {
+			var from = Math.floor(camPos / World.PIECE_WIDTH) - 30;
+			var to = from + 100;
+			var oldTo = this.world.displayed.to;
+
+			this.world.clamp(from, to);
+			
+			if(to > oldTo) {
+				this.train.recalculatePath(oldTo);
+				this.switchCursor.displayPath();
+			}
+		}
+
+		//controls
 		if(!this.train.isCrashed) {
 			if(this.keyUp.isDown) {
 				this.switchCursor.switchCursor(0);
@@ -83,10 +95,14 @@ export default class StagePlay extends PIXI.Container {
 				this.switchCursor.switchCursor(1);
 			}
 			if(this.keyLeft.isDown) {
-				this.train.speed -= Train.SPEED_CHANGE_STEP;
+				if(Train.MIN_SPEED === undefined || this.train.speed > Train.MIN_SPEED) {
+					this.train.speed -= Train.SPEED_CHANGE_STEP;
+				}
 			}
 			if(this.keyRight.isDown) {
-				this.train.speed += Train.SPEED_CHANGE_STEP;
+				if(Train.MAX_SPEED === undefined || this.train.speed < Train.MAX_SPEED) {
+					this.train.speed += Train.SPEED_CHANGE_STEP;
+				}
 			}
 		}
 		if(this.keySpace.isDown) {

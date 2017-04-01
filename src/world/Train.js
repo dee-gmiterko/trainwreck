@@ -23,6 +23,11 @@ export default class Train extends PIXI.Container {
 		var pieceX = Math.floor(this.locomotive.x / World.PIECE_WIDTH);
 
 		if(!this.isCrashed && pieceX < this.path.length - 1) {
+
+			if(this.speed > Train.INITIAL_SPEED) {
+				this.speed -= Train.SPEED_CHANGE_STEP / 4;
+			}
+
 			var pieceY = this.path[pieceX];
 
 			var getY = (x) => {
@@ -52,7 +57,7 @@ export default class Train extends PIXI.Container {
 			this.locomotive.rotation = getAngle(this.locomotive.x);
 			
 			//check for cart on rail
-			if(this.world.rails[pieceX][pieceY].isCart) {
+			if(this.world.rails[pieceX][pieceY] && this.world.rails[pieceX][pieceY].isCart) {
 				this.addCart();
 				this.world.rails[pieceX][pieceY].isCart = false;
 				this.world.updateRailPiece(pieceX, pieceY);
@@ -157,5 +162,7 @@ Train.CART_WIDTH2 = Train.CART_WIDTH / 2;
 Train.CART_HEIGHT2 = Train.CART_HEIGHT / 2;
 Train.CART_DELAY = 32;
 Train.CART_MAX_SKEW = Train.CART_HEIGHT / 3;
-Train.INITIAL_SPEED = 0.4;
-Train.SPEED_CHANGE_STEP = 0.03;
+Train.INITIAL_SPEED = 1.0;
+Train.SPEED_CHANGE_STEP = 0.02;
+Train.MIN_SPEED = 0;
+Train.MAX_SPEED = undefined;
