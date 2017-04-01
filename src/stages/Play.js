@@ -20,8 +20,9 @@ export default class StagePlay extends PIXI.Container {
 		this.world.y = this.settings.height / 2;
 
 		this.train = new Train(this.world, 0, 0, Train.RIGHT);
-		this.train.x = World.PIECE_WIDTH2;
 		this.train.y = this.settings.height / 2 + World.PIECE_HEIGHT2;
+
+		this.enemyTrains = [];
 
 		this.switchCursor = new SwitchCursor(this.train);
 		this.switchCursor.y = this.settings.height / 2;
@@ -37,11 +38,19 @@ export default class StagePlay extends PIXI.Container {
 		this.crashedText.anchor.y = 0.5;
 		this.crashedText.visible = false;
 
+		this.crashedTextQuide = new PIXI.Text("Press space to continue", new PIXI.TextStyle({fontSize: 14, fill: '#FFFFFF'}));
+		this.crashedTextQuide.x = this.settings.width / 2;
+		this.crashedTextQuide.y = this.settings.height / 2;
+		this.crashedTextQuide.anchor.x = 0.5;
+		this.crashedTextQuide.anchor.y = -0.9;
+		this.crashedTextQuide.visible = false;
+
 		this.addChild(this.world);
 		this.addChild(this.train);
 		this.addChild(this.switchCursor);
 		this.addChild(this.cartsText);
 		this.addChild(this.crashedText);
+		this.addChild(this.crashedTextQuide);
 
 		this.keyUp = new KeyListener(38);
 		this.keyDown = new KeyListener(40);
@@ -53,6 +62,14 @@ export default class StagePlay extends PIXI.Container {
 	tick() {
 		this.train.move();
 		
+		this.enemyTrains.forEach(train => {train.move()});
+		this.enemyTrains = this.enemyTrains.filter(train => {
+			if(train.isCrashed) {
+				this.removeChild(train);
+			}
+			return !train.isCrashed;
+		});
+
 		if(!this.train.isCrashed) {
 			this.switchCursor.recalculatePosition();
 		}
@@ -68,6 +85,7 @@ export default class StagePlay extends PIXI.Container {
 		camPos += World.PIECE_WIDTH;
 		this.world.x = -camPos;
 		this.train.x = -camPos + World.PIECE_WIDTH2;
+		this.enemyTrains.forEach(train => train.x = -camPos + World.PIECE_WIDTH2);
 		this.switchCursor.x = -camPos;
 		
 		//show/hide world
@@ -113,6 +131,21 @@ export default class StagePlay extends PIXI.Container {
 
 		if(this.train.isCrashed) {
 			this.crashedText.visible = true;
+			this.crashedTextQuide.visible = true;
+		}
+
+		//spawn enemy train
+		if(Math.random() < 0.03) {
+			var x = Math.floor((this.train.locomotive.x + this.settings.width) / World.PIECE_WIDTH);
+			
+			var ys = Object.keys(this.world.rails[x]);
+			var y = parseInt(ys[Math.floor(Math.random()*ys.length)]);
+
+			var enemyTrain = new Train(this.world, x, y, Train.LEFT, "red");
+			enemyTrain.y = this.settings.height / 2 + World.PIECE_HEIGHT2;
+
+			this.addChild(enemyTrain);
+			this.enemyTrains.push(enemyTrain);
 		}
 	}
 
@@ -122,11 +155,9 @@ export default class StagePlay extends PIXI.Container {
 	}
 
 	unload() {
-		this.removeChild(this.world);
-		this.removeChild(this.train);
-		this.removeChild(this.switchCursor);
-		this.removeChild(this.cartsText);
-		this.removeChild(this.crashedText);
+		for (var i = this.children.length - 1; i >= 0; i--) {
+			this.removeChild(this.children[i]);
+		}
 		
 		this.keyUp.close();
 		this.keyDown.close();
@@ -145,5 +176,6 @@ export default class StagePlay extends PIXI.Container {
 		this.switchCursor = undefined;
 		this.cartsText = undefined;
 		this.crashedText = undefined;
+		this.crashedTextQuide = undefined;
 	}
 }

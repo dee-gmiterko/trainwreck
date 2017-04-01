@@ -1,9 +1,17 @@
+import chroma from 'chroma-js';
 import World from './World';
 
 export default class Train extends PIXI.Container {
 
-	constructor(world, x, y, direction) {
+	constructor(world, x, y, direction, color) {
 		super();
+
+		if(color === undefined) {
+			color = Train.DEFAULT_COLOR;
+
+		}
+		this.color = chroma(color).num();
+		this.colorDark = chroma(color).darken(2).num();
 
 		this.world = world;
 		this.direction = direction;
@@ -13,16 +21,16 @@ export default class Train extends PIXI.Container {
 		this.addCart();
 
 		this.locomotive = this.children[0];
-		this.locomotive.x = x * World.PIECE_WIDTH;
+		this.locomotive.x = x * World.PIECE_WIDTH + World.PIECE_WIDTH * this.direction;
 		this.locomotive.y = y * World.PIECE_HEIGHT;
 		
-		this.path = this.world.getPath(0, 0, this.direction);
+		this.path = this.world.getPath(x, y, this.direction);
 	}
 
 	move() {
 		var pieceX = Math.floor(this.locomotive.x / World.PIECE_WIDTH);
 
-		if(!this.isCrashed && pieceX < this.path.length - 1) {
+		if(!this.isCrashed && this.path[pieceX] !== undefined) {
 
 			if(this.speed > Train.INITIAL_SPEED) {
 				this.speed -= Train.SPEED_CHANGE_STEP / 4;
@@ -57,7 +65,7 @@ export default class Train extends PIXI.Container {
 			this.locomotive.rotation = getAngle(this.locomotive.x);
 			
 			//check for cart on rail
-			if(this.world.rails[pieceX][pieceY] && this.world.rails[pieceX][pieceY].isCart) {
+			if(this.world.rails[pieceX][pieceY].isCart) {
 				this.addCart();
 				this.world.rails[pieceX][pieceY].isCart = false;
 				this.world.updateRailPiece(pieceX, pieceY);
@@ -112,7 +120,7 @@ export default class Train extends PIXI.Container {
 		var cartBottom = new PIXI.Graphics();
 		cartBottom.width = Train.CART_WIDTH;
 		cartBottom.height = Train.CART_HEIGHT;
-		cartBottom.beginFill(0x999900);
+		cartBottom.beginFill(this.colorDark);
 		cartBottom.drawRect(0, 0, Train.CART_WIDTH, Train.CART_HEIGHT);
 
 		cartBottom.x = -Train.CART_WIDTH2;
@@ -123,7 +131,7 @@ export default class Train extends PIXI.Container {
 		var cartTop = new PIXI.Graphics();
 		cartTop.width = Train.CART_WIDTH;
 		cartTop.height = Train.CART_HEIGHT;
-		cartTop.beginFill(0xFFFF00);
+		cartTop.beginFill(this.color);
 		cartTop.drawRect(0, 0, Train.CART_WIDTH, Train.CART_HEIGHT);
 
 		cartTop.x = -Train.CART_WIDTH2;
@@ -131,7 +139,7 @@ export default class Train extends PIXI.Container {
 
 		cartContainer.addChild(cartTop);
 
-		cartContainer.x = -9999999;
+		cartContainer.x = -9999999 * this.direction;
 		cartContainer.y = 0;
 
 		this.addChild(cartContainer);
@@ -166,3 +174,4 @@ Train.INITIAL_SPEED = 1.0;
 Train.SPEED_CHANGE_STEP = 0.02;
 Train.MIN_SPEED = 0;
 Train.MAX_SPEED = undefined;
+Train.DEFAULT_COLOR = 'yellow';
