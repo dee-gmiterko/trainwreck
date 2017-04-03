@@ -1,31 +1,50 @@
 import Stages from './common/Stages';
 import StageMenu from './stages/Menu';
 import StagePlay from './stages/Play';
+import Bumper from './common/Bumper';
+import KeyListener from './common/KeyListener';
 
 export default class App {
 
 	constructor(settings) {
 		this.settings = settings;
 		this.stages = new Stages();
+
+		var bumperClose = () => {
+			this.run = true;
+			if(this.setuped) {
+				this.gameLoop();
+			}
+			this.bumper.hide();
+		};
+
+		this.bumper = new Bumper(bumperClose);
 		
 		this.stages.addStage("menu", new StageMenu(this.stages, settings));
 		this.stages.addStage("play", new StagePlay(this.stages, settings));
 		this.stages.changeStage("play");
 
+		this.bumper.show();
+
+		new KeyListener(32, bumperClose);
 	}
 
 	start() {
 		var setup = () => {
-			var renderer = PIXI.autoDetectRenderer(this.settings.width, this.settings.height);
-			document.body.appendChild(renderer.view);
+			this.setuped = true;
 
-			var gameLoop = () => {
-				requestAnimationFrame(gameLoop);
+			this.renderer = PIXI.autoDetectRenderer(this.settings.width, this.settings.height);
+			document.body.appendChild(this.renderer.view);
+
+			this.gameLoop = () => {
+				requestAnimationFrame(this.gameLoop);
 				this.stages.beforeRender();
-				renderer.render(this.stages.current);
+				this.renderer.render(this.stages.current);
 			}
-			gameLoop();
 
+			if(this.run) {
+				this.gameLoop();
+			}
 		}
 
 		PIXI.loader
