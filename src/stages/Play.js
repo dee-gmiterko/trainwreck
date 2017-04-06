@@ -16,10 +16,15 @@ export default class StagePlay extends PIXI.Container {
 	load() {
 		this.camOffset = this.cameraPosPercentage * this.settings.width;
 
+		this.background = new PIXI.Graphics();
+		this.background.beginFill(World.BACKGROUND_COLOR);
+		this.background.drawRect(0, 0, this.settings.width, this.settings.height);
+		this.addChild(this.background);
+
 		this.world = new World();
 		this.world.y = this.settings.height / 2;
 
-		this.train = new Train(this.world, 0, 0, Train.RIGHT);
+		this.train = new Train(this.world, 0, 0, Train.RIGHT, 'yellow');
 		this.train.y = this.settings.height / 2 + World.PIECE_HEIGHT2;
 
 		this.enemyTrains = [];
@@ -135,7 +140,7 @@ export default class StagePlay extends PIXI.Container {
 		}
 
 		//spawn enemy train
-		if(Math.random() < 0.03) {
+		if(Math.random() < 0.005) {
 			var x = Math.floor((this.train.locomotive.x + this.settings.width) / World.PIECE_WIDTH);
 			
 			var ys = Object.keys(this.world.rails[x]);
@@ -171,6 +176,7 @@ export default class StagePlay extends PIXI.Container {
 		this.keyRight = undefined;
 		this.keySpace = undefined;
 
+		this.background = undefined;
 		this.world = undefined;
 		this.train = undefined;
 		this.switchCursor = undefined;

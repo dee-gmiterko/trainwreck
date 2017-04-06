@@ -170,8 +170,9 @@ Train.CART_WIDTH2 = Train.CART_WIDTH / 2;
 Train.CART_HEIGHT2 = Train.CART_HEIGHT / 2;
 Train.CART_DELAY = 32;
 Train.CART_MAX_SKEW = Train.CART_HEIGHT / 3;
-Train.INITIAL_SPEED = 1.0;
-Train.SPEED_CHANGE_STEP = 0.02;
+Train.INITIAL_SPEED = 0.6;
+Train.SPEED_CHANGE_STEP = 0.005;
 Train.MIN_SPEED = 0;
 Train.MAX_SPEED = undefined;
-Train.DEFAULT_COLOR = 'yellow';
+
+Train.DEFAULT_COLOR = 'white';

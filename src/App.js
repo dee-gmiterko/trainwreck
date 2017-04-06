@@ -24,7 +24,11 @@ export default class App {
 		this.stages.addStage("play", new StagePlay(this.stages, settings));
 		this.stages.changeStage("play");
 
-		this.bumper.show();
+		if(settings.app_bumper) {
+			this.bumper.show();
+		} else {
+			this.run = true;
+		}
 
 		new KeyListener(32, bumperClose);
 	}

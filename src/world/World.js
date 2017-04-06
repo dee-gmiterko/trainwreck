@@ -1,3 +1,5 @@
+import chroma from 'chroma-js';
+import railEasing from 'eases/sine-in-out';
 import RailPiece from './RailPiece';
 import Train from './Train';
 
@@ -234,24 +236,33 @@ export default class World extends PIXI.Container {
 
 	displayRailPiece(railSprite, railPiece, railIndex) {
 		railSprite.clear();
-
+		
 		var h;
 
 		for(var toRailIndex of railPiece.to) {
 			h = toRailIndex - railIndex;
-			railSprite.lineStyle(5, 0xffffff, 0.5);
-			railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
-			railSprite.lineTo(World.PIECE_WIDTH, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
+			railSprite.lineStyle(5, 0xffffff);
+			for(var i=0; i<World.SUBPIECES; i++) {
+				railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
+				railSprite.lineTo(World.PIECE_WIDTH, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
+			}
 			railSprite.endFill();
 		}
 
+
+
+
+
+
 		for(var fromRailIndex of railPiece.from) {
 			h = fromRailIndex - railIndex;
-			railSprite.lineStyle(5, 0xffffff, 0.5);
+			railSprite.lineStyle(5, 0xffffff);
 			railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
 			railSprite.lineTo(0, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
 			railSprite.endFill();
 		}
+
+
 
 		if(railPiece.isCart) {
 			railSprite.beginFill(0xFFFF00);
@@ -300,7 +311,11 @@ export default class World extends PIXI.Container {
 	}
 }
 
-World.PIECE_WIDTH = 50;
-World.PIECE_HEIGHT = 20;
+World.PIECE_WIDTH = 100;
+World.PIECE_HEIGHT = 16;
 World.PIECE_WIDTH2 = World.PIECE_WIDTH / 2;
 World.PIECE_HEIGHT2 = World.PIECE_HEIGHT / 2;
+
+World.BACKGROUND_COLOR = 0x000000;
+World.SUBPIECES = 20;
+World.TRACK_WIDTH2 = 3;

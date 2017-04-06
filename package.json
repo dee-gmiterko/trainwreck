@@ -30,6 +30,7 @@
     "css-loader": "0.26.1",
     "detect-port": "1.0.1",
     "dotenv": "2.0.0",
+    "eases": "^1.0.8",
     "eslint": "3.8.1",
     "eslint-config-react-app": "^0.5.1",
     "eslint-loader": "1.6.0",
