@@ -1,5 +1,6 @@
 import chroma from 'chroma-js';
-import railEasing from 'eases/sine-in-out';
+import railEasingIn from 'eases/sine-in';
+import railEasingOut from 'eases/sine-out';
 import RailPiece from './RailPiece';
 import Train from './Train';
 
@@ -181,16 +182,16 @@ export default class World extends PIXI.Container {
 				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
 			}
 		}, 2);
-	*/
-	}
+*/
+}
 
-	display(from, to) {
-		if(from === undefined) {
-			from = 0;
-		}
-		if(to === undefined) {
-			to = this.rails.length;
-		}
+display(from, to) {
+	if(from === undefined) {
+		from = 0;
+	}
+	if(to === undefined) {
+		to = this.rails.length;
+	}
 
 		//remove before from
 		var worldFrom = World.PIECE_WIDTH * from;
@@ -241,27 +242,13 @@ export default class World extends PIXI.Container {
 
 		for(var toRailIndex of railPiece.to) {
 			h = toRailIndex - railIndex;
-			railSprite.lineStyle(5, 0xffffff);
-			for(var i=0; i<World.SUBPIECES; i++) {
-				railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
-				railSprite.lineTo(World.PIECE_WIDTH, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
-			}
-			railSprite.endFill();
+			this.displayRailPieceSegment(railSprite, World.PIECE_WIDTH2, World.PIECE_HEIGHT2, World.PIECE_WIDTH, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2, railEasingIn)
 		}
-
-
-
-
-
 
 		for(var fromRailIndex of railPiece.from) {
 			h = fromRailIndex - railIndex;
-			railSprite.lineStyle(5, 0xffffff);
-			railSprite.moveTo(World.PIECE_WIDTH2, World.PIECE_HEIGHT2);
-			railSprite.lineTo(0, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2);
-			railSprite.endFill();
+			this.displayRailPieceSegment(railSprite, 0, World.PIECE_HEIGHT2 + h * World.PIECE_HEIGHT2, World.PIECE_WIDTH2, World.PIECE_HEIGHT2, railEasingOut)
 		}
-
 
 
 		if(railPiece.isCart) {
@@ -269,6 +256,40 @@ export default class World extends PIXI.Container {
 			railSprite.lineStyle();
 			railSprite.drawRect(World.PIECE_WIDTH2 - Train.CART_WIDTH2, World.PIECE_HEIGHT2 - Train.CART_HEIGHT2, Train.CART_WIDTH, Train.CART_HEIGHT);
 		}
+	}
+
+	displayRailPieceSegment(railSprite, fromX, fromY, toX, toY, railEasing) {
+		var dX = toX-fromX;
+		
+		//top rail
+		railSprite.lineStyle(1, 0xffffff);
+		for(var i=0; i<World.SUBPIECES; i++) {
+			railSprite.moveTo(fromX + ((i-1)/World.SUBPIECES)*dX,
+				fromY + railEasing((i-1)/World.SUBPIECES) * (toY - fromY) - World.TRACK_WIDTH2);
+			railSprite.lineTo(fromX + ((i)/World.SUBPIECES)*dX,
+				fromY + railEasing((i)/World.SUBPIECES) * (toY - fromY) - World.TRACK_WIDTH2);
+		}
+		railSprite.endFill();
+
+		//bottom rail
+		railSprite.lineStyle(1, 0xffffff);
+		for(var i=0; i<World.SUBPIECES; i++) {
+			railSprite.moveTo(fromX + ((i-1)/World.SUBPIECES)*dX,
+				fromY + railEasing((i-1)/World.SUBPIECES) * (toY - fromY) + World.TRACK_WIDTH2);
+			railSprite.lineTo(fromX + ((i)/World.SUBPIECES)*dX,
+				fromY + railEasing((i)/World.SUBPIECES) * (toY - fromY) + World.TRACK_WIDTH2);
+		}
+		railSprite.endFill();
+
+		//railroad tie
+		railSprite.lineStyle(1, 0xaaaaaa);
+		for(var i=0; i<World.SUBPIECES; i++) {
+			railSprite.moveTo(fromX + ((i)/World.SUBPIECES)*dX,
+				fromY + railEasing((i)/World.SUBPIECES) * (toY - fromY) - World.TRACK_TIE_WIDTH2);
+			railSprite.lineTo(fromX + ((i)/World.SUBPIECES)*dX,
+				fromY + railEasing((i)/World.SUBPIECES) * (toY - fromY) + World.TRACK_TIE_WIDTH2);
+		}
+		railSprite.endFill();
 	}
 
 	updateRailPiece(railsOffset, railIndex) {
@@ -293,7 +314,7 @@ export default class World extends PIXI.Container {
 				break;
 			}
 			var next = (direction === 1) ? railPiece.getTo() : railPiece.getFrom();
-			
+
 			if(next === undefined) {
 				break; //EOW
 			}
@@ -311,11 +332,12 @@ export default class World extends PIXI.Container {
 	}
 }
 
-World.PIECE_WIDTH = 100;
+World.PIECE_WIDTH = 88;
 World.PIECE_HEIGHT = 16;
 World.PIECE_WIDTH2 = World.PIECE_WIDTH / 2;
 World.PIECE_HEIGHT2 = World.PIECE_HEIGHT / 2;
 
 World.BACKGROUND_COLOR = 0x000000;
-World.SUBPIECES = 20;
-World.TRACK_WIDTH2 = 3;
+World.SUBPIECES = 16;
+World.TRACK_WIDTH2 = 2;
+World.TRACK_TIE_WIDTH2 = 3;
