@@ -8,6 +8,7 @@ export default class KeyListener {
 		this.release = release;
 
 		this.downHandler = event => {
+			console.log("key down");
 			if (event.keyCode === this.code) {
 				if (this.isUp && this.press) this.press();
 				this.isDown = true;

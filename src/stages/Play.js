@@ -10,24 +10,19 @@ export default class StagePlay extends PIXI.Container {
 		
 		this.stages = stages;
 		this.settings = settings;
-		this.cameraPosPercentage = 0.21;
 	}
 
 	load() {
-		this.camOffset = this.cameraPosPercentage * this.settings.width;
+		this.camOffset = StagePlay.CAMERA_CENTER_PERC * this.settings.width;
 
 		this.background = new PIXI.Graphics();
-		this.background.beginFill(World.BACKGROUND_COLOR);
+		this.background.beginFill(StagePlay.BACKGROUND_COLOR);
 		this.background.drawRect(0, 0, this.settings.width, this.settings.height);
-		this.addChild(this.background);
-
+		
 		this.world = new World();
 		this.world.y = this.settings.height / 2;
 
-		this.train = new Train(this.world, 0, 0, Train.RIGHT, 'yellow');
-		this.train.y = this.settings.height / 2 + World.PIECE_HEIGHT2;
-
-		this.enemyTrains = [];
+		this.train = this.world.getTrain();
 
 		this.switchCursor = new SwitchCursor(this.train);
 		this.switchCursor.y = this.settings.height / 2;
@@ -50,8 +45,8 @@ export default class StagePlay extends PIXI.Container {
 		this.crashedTextQuide.anchor.y = -0.9;
 		this.crashedTextQuide.visible = false;
 
+		this.addChild(this.background);
 		this.addChild(this.world);
-		this.addChild(this.train);
 		this.addChild(this.switchCursor);
 		this.addChild(this.cartsText);
 		this.addChild(this.crashedText);
@@ -65,15 +60,7 @@ export default class StagePlay extends PIXI.Container {
 	}
 
 	tick() {
-		this.train.move();
-		
-		this.enemyTrains.forEach(train => {train.move()});
-		this.enemyTrains = this.enemyTrains.filter(train => {
-			if(train.isCrashed) {
-				this.removeChild(train);
-			}
-			return !train.isCrashed;
-		});
+		this.world.trains.children.forEach(train => train.move());
 
 		if(!this.train.isCrashed) {
 			this.switchCursor.recalculatePosition();
@@ -89,8 +76,6 @@ export default class StagePlay extends PIXI.Container {
 		}
 		camPos += World.PIECE_WIDTH;
 		this.world.x = -camPos;
-		this.train.x = -camPos + World.PIECE_WIDTH2;
-		this.enemyTrains.forEach(train => train.x = -camPos + World.PIECE_WIDTH2);
 		this.switchCursor.x = -camPos;
 		
 		//show/hide world
@@ -128,10 +113,7 @@ export default class StagePlay extends PIXI.Container {
 				}
 			}
 		}
-		if(this.keySpace.isDown) {
-			this.restart();
-		}
-
+		
 		this.cartsText.text = this.train.getCartCount();
 
 		if(this.train.isCrashed) {
@@ -140,17 +122,23 @@ export default class StagePlay extends PIXI.Container {
 		}
 
 		//spawn enemy train
-		if(Math.random() < 0.005) {
+		if(Math.random() < StagePlay.ENEMY_SPAWN_RATE * this.train.speed) {
 			var x = Math.floor((this.train.locomotive.x + this.settings.width) / World.PIECE_WIDTH);
 			
 			var ys = Object.keys(this.world.rails[x]);
-			var y = parseInt(ys[Math.floor(Math.random()*ys.length)]);
+			var y = parseInt(ys[Math.floor(Math.random()*ys.length)], 10);
 
-			var enemyTrain = new Train(this.world, x, y, Train.LEFT, "red");
-			enemyTrain.y = this.settings.height / 2 + World.PIECE_HEIGHT2;
+			var enemyTrain = new Train(this.world, x, y, Train.LEFT, true);
+			
+			while(Math.random() < StagePlay.ENEMY_SPAWN_CARTS_PROB) {
+				enemyTrain.addCart();
+			}
 
-			this.addChild(enemyTrain);
-			this.enemyTrains.push(enemyTrain);
+			this.world.trains.addChild(enemyTrain);
+		}
+
+		if(this.keySpace.isDown) {
+			this.restart();
 		}
 	}
 
@@ -160,9 +148,12 @@ export default class StagePlay extends PIXI.Container {
 	}
 
 	unload() {
-		for (var i = this.children.length - 1; i >= 0; i--) {
-			this.removeChild(this.children[i]);
-		}
+		this.removeChild(this.background);
+		this.removeChild(this.world);
+		this.removeChild(this.switchCursor);
+		this.removeChild(this.cartsText);
+		this.removeChild(this.crashedText);
+		this.removeChild(this.crashedTextQuide);
 		
 		this.keyUp.close();
 		this.keyDown.close();
@@ -185,3 +176,8 @@ export default class StagePlay extends PIXI.Container {
 		this.crashedTextQuide = undefined;
 	}
 }
+
+StagePlay.CAMERA_CENTER_PERC = 0.21;
+StagePlay.BACKGROUND_COLOR = 0x222222;
+StagePlay.ENEMY_SPAWN_RATE = 0.003;
+StagePlay.ENEMY_SPAWN_CARTS_PROB = 0.4;

@@ -3,20 +3,23 @@ import World from './World';
 
 export default class Train extends PIXI.Container {
 
-	constructor(world, x, y, direction, color) {
+	constructor(world, x, y, direction, enemy) {
 		super();
-
-		if(color === undefined) {
-			color = Train.DEFAULT_COLOR;
-
-		}
-		this.color = chroma(color).num();
-		this.colorDark = chroma(color).darken(2).num();
 
 		this.world = world;
 		this.direction = direction;
 		this.speed = Train.INITIAL_SPEED;
 		this.isCrashed = false;
+
+		this.amEnemy = enemy;
+		var color;
+		if(enemy) {
+			color = Train.ENEMY_COLOR;
+		} else {
+			color = Train.PLAYER_COLOR;
+		}
+		this.color = chroma(color).num();
+		this.colorDark = chroma(color).darken(2).num();
 
 		this.addCart();
 
@@ -92,8 +95,10 @@ export default class Train extends PIXI.Container {
 				this.children[i].children[0].y = -Train.CART_HEIGHT2 - skew;
 			}
 		} else {
-			this.isCrashed = true;
-
+			if(!this.isCrashed) {
+				this.onCrash();
+			}
+			
 			//move locomotive
 			this.speed *= 0.92;
 			this.locomotive.rotation += Math.min(3, this.speed) * (Math.random() - 0.5) * 0.2;
@@ -111,6 +116,28 @@ export default class Train extends PIXI.Container {
 				this.children[i].y = this.children[i-1].y + dy;
 				this.children[i].rotation = Math.min(Math.max(Math.atan(dy / dx), -1), 1);
 			}
+		}
+
+		//test other train collision
+		this.world.trains.children.forEach(train => {
+			if(train === this) {
+				return;
+			}
+			train.children.forEach(cart => {
+				var dx = cart.x - this.locomotive.x;
+				var dy = cart.y - this.locomotive.y;
+				if(Math.sqrt(dx*dx+dy*dy) < (this.amEnemy ? Train.TRAIN_CRASH_DISTANCE * 0.81 : Train.TRAIN_CRASH_DISTANCE)) {
+					this.onCrash();
+				}
+			});
+		});
+	}
+
+	onCrash() {
+		this.isCrashed = true;
+
+		if(this.amEnemy) {
+			this.world.trains.removeChild(this);
 		}
 	}
 
@@ -174,5 +201,7 @@ Train.INITIAL_SPEED = 0.6;
 Train.SPEED_CHANGE_STEP = 0.005;
 Train.MIN_SPEED = 0;
 Train.MAX_SPEED = undefined;
+Train.TRAIN_CRASH_DISTANCE = Train.CART_WIDTH / 3;
 
-Train.DEFAULT_COLOR = 'white';
+Train.ENEMY_COLOR = 'red';
+Train.PLAYER_COLOR = 'yellow';

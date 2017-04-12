@@ -18,7 +18,9 @@ export default class Bumper {
 	}
 
 	hide() {
-		this.video.style.display = "none";
+		if(this.video) {
+			this.video.style.display = "none";
+		}
 	}
 
 }
