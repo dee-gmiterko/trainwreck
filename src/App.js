@@ -11,6 +11,9 @@ export default class App {
 		this.stages = new Stages();
 
 		var bumperClose = () => {
+			if(this.run) {
+				return;
+			}
 			this.run = true;
 			if(this.setuped) {
 				this.gameLoop();
@@ -24,7 +27,7 @@ export default class App {
 		this.stages.addStage("play", new StagePlay(this.stages, settings));
 		this.stages.changeStage("play");
 
-		if(settings.app_bumper) {
+		if(App.BUMPER) {
 			this.bumper.show();
 		} else {
 			this.run = true;
@@ -37,13 +40,13 @@ export default class App {
 		var setup = () => {
 			this.setuped = true;
 
-			this.renderer = PIXI.autoDetectRenderer(this.settings.width, this.settings.height);
+			this.renderer = PIXI.autoDetectRenderer(this.settings.width, this.settings.height, {antialias: true});
 			document.body.appendChild(this.renderer.view);
 
 			this.gameLoop = () => {
-				requestAnimationFrame(this.gameLoop);
 				this.stages.beforeRender();
 				this.renderer.render(this.stages.current);
+				requestAnimationFrame(this.gameLoop);
 			}
 
 			if(this.run) {
@@ -55,5 +58,6 @@ export default class App {
 		.add("images/anyImage.png")
 		.load(setup);
 	}
-
 }
+
+App.BUMPER = true;

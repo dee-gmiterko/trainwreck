@@ -102,7 +102,7 @@ export default class World extends PIXI.Container {
 
 
 		if(railPiece.isCart) {
-			railSprite.beginFill(0xFFFF00);
+			railSprite.beginFill(World.EMPTY_CART_COLOR);
 			railSprite.lineStyle();
 			railSprite.drawRect(World.PIECE_WIDTH2 - Train.CART_WIDTH2, World.PIECE_HEIGHT2 - Train.CART_HEIGHT2, Train.CART_WIDTH, Train.CART_HEIGHT);
 		}
@@ -112,7 +112,7 @@ export default class World extends PIXI.Container {
 		var dX = toX-fromX;
 		
 		//top rail
-		railSprite.lineStyle(1, 0xffffff);
+		railSprite.lineStyle(1, World.RAIL_COLOR);
 		for(let i=0; i<World.SUBPIECES; i++) {
 			railSprite.moveTo(fromX + ((i-1)/World.SUBPIECES)*dX,
 				fromY + railEasing((i-1)/World.SUBPIECES) * (toY - fromY) - World.TRACK_WIDTH2);
@@ -122,7 +122,7 @@ export default class World extends PIXI.Container {
 		railSprite.endFill();
 
 		//bottom rail
-		railSprite.lineStyle(1, 0xffffff);
+		railSprite.lineStyle(1, World.RAIL_COLOR);
 		for(let i=0; i<World.SUBPIECES; i++) {
 			railSprite.moveTo(fromX + ((i-1)/World.SUBPIECES)*dX,
 				fromY + railEasing((i-1)/World.SUBPIECES) * (toY - fromY) + World.TRACK_WIDTH2);
@@ -132,7 +132,7 @@ export default class World extends PIXI.Container {
 		railSprite.endFill();
 
 		//railroad tie
-		railSprite.lineStyle(1, 0xaaaaaa);
+		railSprite.lineStyle(1, World.RAIL_COLOR);
 		for(let i=0; i<World.SUBPIECES; i++) {
 			railSprite.moveTo(fromX + ((i)/World.SUBPIECES)*dX,
 				fromY + railEasing((i)/World.SUBPIECES) * (toY - fromY) - World.TRACK_TIE_WIDTH2);
@@ -198,3 +198,6 @@ World.PIECE_HEIGHT2 = World.PIECE_HEIGHT / 2;
 World.SUBPIECES = 16;
 World.TRACK_WIDTH2 = 2;
 World.TRACK_TIE_WIDTH2 = 3;
+
+World.EMPTY_CART_COLOR = 0xFFFFFF;
+World.RAIL_COLOR = 0xFFFFFF;

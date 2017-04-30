@@ -19,7 +19,7 @@ export default class Train extends PIXI.Container {
 			color = Train.PLAYER_COLOR;
 		}
 		this.color = chroma(color).num();
-		this.colorDark = chroma(color).darken(2).num();
+		this.colorDark = chroma(color).darken(1).num();
 
 		this.addCart();
 
@@ -94,6 +94,57 @@ export default class Train extends PIXI.Container {
 
 				this.children[i].children[0].y = -Train.CART_HEIGHT2 - skew;
 			}
+
+			//test other train collision
+			this.world.trains.children.forEach(train => {
+				if(train === this) {
+					return;
+				}
+				if(train.isCrashed) {
+					return;
+				}
+				if(this.amEnemy == train.amEnemy) {
+					return;
+				}
+				train.children.forEach(cart => {
+					var dx = cart.x - this.locomotive.x;
+					var dy = cart.y - this.locomotive.y;
+					if(Math.sqrt(dx*dx+dy*dy) < (this.amEnemy ? Train.TRAIN_CRASH_DISTANCE * 0.81 : Train.TRAIN_CRASH_DISTANCE)) {
+						
+						let meCarts = this.children.length - train.children.length;
+						let itCarts = train.children.length - this.children.length;
+
+						let hard = (meCarts < 1 && itCarts >= 1) || (meCarts >= 1 && itCarts < 1);
+
+						if(meCarts < 1) {
+							this.setCarts(1);
+							this.onCrash();
+							this.speed = Math.max(this.speed, train.speed);
+							if(hard) {
+								this.locomotive.rotation += Math.min(1, this.speed) * Math.PI / 4;
+							} else {
+								this.speed *= -1;
+							}
+						} else {
+							this.setCarts(meCarts);
+						}
+
+						if(itCarts < 1) {
+							train.setCarts(1);
+							train.onCrash();
+							train.speed = Math.max(this.speed, train.speed);
+							if(hard) {
+								train.locomotive.rotation += Math.min(1, train.speed) * -Math.PI / 4;
+							} else {
+								train.speed *= -1;
+							}
+						} else {
+							train.setCarts(itCarts);
+						}
+					}
+				});
+			});
+
 		} else {
 			if(!this.isCrashed) {
 				this.onCrash();
@@ -117,27 +168,17 @@ export default class Train extends PIXI.Container {
 				this.children[i].rotation = Math.min(Math.max(Math.atan(dy / dx), -1), 1);
 			}
 		}
-
-		//test other train collision
-		this.world.trains.children.forEach(train => {
-			if(train === this) {
-				return;
-			}
-			train.children.forEach(cart => {
-				var dx = cart.x - this.locomotive.x;
-				var dy = cart.y - this.locomotive.y;
-				if(Math.sqrt(dx*dx+dy*dy) < (this.amEnemy ? Train.TRAIN_CRASH_DISTANCE * 0.81 : Train.TRAIN_CRASH_DISTANCE)) {
-					this.onCrash();
-				}
-			});
-		});
 	}
 
 	onCrash() {
+		if(this.isCrashed) {
+			return;
+		}
+
 		this.isCrashed = true;
 
 		if(this.amEnemy) {
-			this.world.trains.removeChild(this);
+			setTimeout(() => {this.world.trains.removeChild(this)}, 3000);
 		}
 	}
 
@@ -176,6 +217,15 @@ export default class Train extends PIXI.Container {
 		this.removeChild(this.children[this.children.length-1]);
 	}
 
+	setCarts(count) {
+		while(this.children.length < count) {
+			this.addCart();
+		}
+		while(this.children.length > count) {
+			this.removeCart();
+		}
+	}
+
 	recalculatePath(from) {
 		if(from === undefined) {
 			from = Math.floor(this.children[0].x / World.PIECE_WIDTH);
@@ -197,11 +247,11 @@ Train.CART_WIDTH2 = Train.CART_WIDTH / 2;
 Train.CART_HEIGHT2 = Train.CART_HEIGHT / 2;
 Train.CART_DELAY = 32;
 Train.CART_MAX_SKEW = Train.CART_HEIGHT / 3;
-Train.INITIAL_SPEED = 0.6;
-Train.SPEED_CHANGE_STEP = 0.005;
+Train.INITIAL_SPEED = 1.0;
+Train.SPEED_CHANGE_STEP = 0.01;
 Train.MIN_SPEED = 0;
 Train.MAX_SPEED = undefined;
 Train.TRAIN_CRASH_DISTANCE = Train.CART_WIDTH / 3;
 
-Train.ENEMY_COLOR = 'red';
-Train.PLAYER_COLOR = 'yellow';
+Train.ENEMY_COLOR = '#247192';
+Train.PLAYER_COLOR = '#9FBC12';

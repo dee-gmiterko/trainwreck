@@ -48,7 +48,7 @@ export default class SwitchCursor extends PIXI.Container {
 		cursor.width = SwitchCursor.SIZE;
 		cursor.height = SwitchCursor.SIZE;
 
-		cursor.lineStyle(SwitchCursor.WIDTH, 0xff0000);
+		cursor.lineStyle(SwitchCursor.WIDTH, SwitchCursor.CURSOR_COLOR);
 		cursor.drawEllipse(0, 0, SwitchCursor.SIZE, SwitchCursor.SIZE);
 		for (var i=0; i < 4; i++) {
 			var x = Math.cos(i / 2 * Math.PI + Math.PI/4);
@@ -65,7 +65,7 @@ export default class SwitchCursor extends PIXI.Container {
 	displayPath() {
 		this.path.clear();
 		
-		this.path.lineStyle(SwitchCursor.WIDTH, 0xffff00, 0.5);
+		this.path.lineStyle(7, SwitchCursor.CURSOR_COLOR, 0.8);
 		this.path.moveTo(World.PIECE_WIDTH, World.PIECE_HEIGHT2);
 		for (var i=0; i < this.train.path.length; i++) {
 			this.path.lineTo(World.PIECE_WIDTH * i + World.PIECE_WIDTH2, World.PIECE_HEIGHT * this.train.path[i] + World.PIECE_HEIGHT2);
@@ -92,3 +92,4 @@ export default class SwitchCursor extends PIXI.Container {
 
 SwitchCursor.WIDTH = 2;
 SwitchCursor.SIZE = 15;
+SwitchCursor.CURSOR_COLOR = 0x9FBC12;

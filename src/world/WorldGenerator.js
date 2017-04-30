@@ -45,7 +45,7 @@ export default class WorldGenerator {
 			railIndex = parseInt(railIndex, 10);
 			var railPiece = rails[railIndex];
 
-			if(Math.random() < 0.05) {
+			if(Math.random() < WorldGenerator.EMPTY_CART_PROBABILITY) {
 				railPiece.isCart = true;
 			}
 		});
@@ -53,7 +53,20 @@ export default class WorldGenerator {
 
 	clamp(from, to) {
 		for(var i=this.generated.to; i<to; i++) {
-			this.generateNext(Math.min(7, (2 * Math.floor(Math.abs(Math.sin(i / 10)) * i / 7)) + 1));
+
+			var psin = (x, f) => {
+				if(f == undefined) {
+					return Math.pow(Math.abs(Math.sin(x)), 2);
+				} else {
+					let r = Math.pow(Math.abs(Math.sin(x)), 2);
+					return f + r * (1-f);
+				}
+			};
+
+			var width = 5 * psin(i / 321, 0.3) * Math.min(1, psin((i + 1) / 10) + psin((i - 64 ) / 41)) * psin(Math.sin(i/ 51) * 10, 0.5);
+			width = Math.min(9, (2 * Math.floor(width)) + 1);
+
+			this.generateNext(width);
 		}
 		this.generated.to = to;
 	}
@@ -169,3 +182,5 @@ export default class WorldGenerator {
 		railB.addFrom(indexA);
 	}
 }
+
+WorldGenerator.EMPTY_CART_PROBABILITY = 0.09;

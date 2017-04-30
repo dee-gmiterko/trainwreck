@@ -27,7 +27,7 @@ export default class StagePlay extends PIXI.Container {
 		this.switchCursor = new SwitchCursor(this.train);
 		this.switchCursor.y = this.settings.height / 2;
 
-		this.cartsText = new PIXI.Text("0", new PIXI.TextStyle({fontSize: 40, fill: '#FFFFFF'}));
+		this.cartsText = new PIXI.Text("0", new PIXI.TextStyle({fontSize: 40, fill: '#9FBC12'}));
 		this.cartsText.x = 16;
 		this.cartsText.y = 16;
 
@@ -46,8 +46,8 @@ export default class StagePlay extends PIXI.Container {
 		this.crashedTextQuide.visible = false;
 
 		this.addChild(this.background);
-		this.addChild(this.world);
 		this.addChild(this.switchCursor);
+		this.addChild(this.world);
 		this.addChild(this.cartsText);
 		this.addChild(this.crashedText);
 		this.addChild(this.crashedTextQuide);
@@ -178,6 +178,6 @@ export default class StagePlay extends PIXI.Container {
 }
 
 StagePlay.CAMERA_CENTER_PERC = 0.21;
-StagePlay.BACKGROUND_COLOR = 0x222222;
-StagePlay.ENEMY_SPAWN_RATE = 0.003;
-StagePlay.ENEMY_SPAWN_CARTS_PROB = 0.4;
+StagePlay.BACKGROUND_COLOR = 0xE1303C;
+StagePlay.ENEMY_SPAWN_RATE = 0.002;
+StagePlay.ENEMY_SPAWN_CARTS_PROB = 0.2;
