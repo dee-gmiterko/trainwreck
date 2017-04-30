@@ -30,7 +30,7 @@ export default class StageTopScore extends PIXI.Container {
 			var y = Math.floor(i / 10);
 
 			var color = '#E1303C';
-			if(this.myScore != undefined && this.myScore == i) {
+			if(this.myScore === i) {
 				color = '#9FBC12';
 			}
 

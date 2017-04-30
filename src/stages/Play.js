@@ -131,7 +131,7 @@ export default class StagePlay extends PIXI.Container {
 		}
 		
 		this.cartsText.text = this.train.getCartCount();
-		var score = Math.floor(this.train.locomotive.x / (World.PIECE_WIDTH * StagePlay.SCORE_SPEED));
+		let score = Math.floor(this.train.locomotive.x / (World.PIECE_WIDTH * StagePlay.SCORE_SPEED));
 		this.scoreText.text = score;
 
 		if(this.train.isCrashed) {
@@ -157,7 +157,7 @@ export default class StagePlay extends PIXI.Container {
 
 		if(this.keySpace.isDown) {
 			if(this.train.isCrashed) {
-				var score = Math.floor(this.train.locomotive.x / (World.PIECE_WIDTH * StagePlay.SCORE_SPEED));
+				let score = Math.floor(this.train.locomotive.x / (World.PIECE_WIDTH * StagePlay.SCORE_SPEED));
 				this.stages.getStage("topScore").addScore(score);
 				this.stages.changeStage("topScore");
 			} else {

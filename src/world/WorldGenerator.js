@@ -55,7 +55,7 @@ export default class WorldGenerator {
 		for(var i=this.generated.to; i<to; i++) {
 
 			var psin = (x, f) => {
-				if(f == undefined) {
+				if(f === undefined) {
 					return Math.pow(Math.abs(Math.sin(x)), 2);
 				} else {
 					let r = Math.pow(Math.abs(Math.sin(x)), 2);

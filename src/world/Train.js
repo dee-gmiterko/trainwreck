@@ -38,9 +38,7 @@ export default class Train extends PIXI.Container {
 			if(this.speed > Train.INITIAL_SPEED) {
 				this.speed -= Train.SPEED_CHANGE_STEP / 4;
 			}
-
-			var pieceY = this.path[pieceX];
-
+			
 			var getY = (x) => {
 				if(x < 0) {
 					return 0;
@@ -68,10 +66,12 @@ export default class Train extends PIXI.Container {
 			this.locomotive.rotation = getAngle(this.locomotive.x);
 			
 			//check for cart on rail
-			if(this.world.rails[pieceX][pieceY].isCart) {
+			var checkPieceX = Math.round(this.locomotive.x / World.PIECE_WIDTH);
+			var checkPieceY = this.path[checkPieceX];
+			if(this.world.rails[checkPieceX] && this.world.rails[checkPieceX][checkPieceY] && this.world.rails[checkPieceX][checkPieceY].isCart) {
 				this.addCart();
-				this.world.rails[pieceX][pieceY].isCart = false;
-				this.world.updateRailPiece(pieceX, pieceY);
+				this.world.rails[checkPieceX][checkPieceY].isCart = false;
+				this.world.updateRailPiece(checkPieceX, checkPieceY);
 			}
 
 			//move other carts
@@ -103,7 +103,7 @@ export default class Train extends PIXI.Container {
 				if(train.isCrashed) {
 					return;
 				}
-				if(this.amEnemy == train.amEnemy) {
+				if(this.amEnemy === train.amEnemy) {
 					return;
 				}
 				train.children.forEach(cart => {

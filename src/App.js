@@ -28,7 +28,7 @@ export default class App {
 		
 		this.stages.addStage("play", new StagePlay(this.stages, settings));
 		this.stages.addStage("topScore", new StageTopScore(this.stages, this.topScore, settings));
-		this.stages.changeStage("topScore");
+		this.stages.changeStage("play");
 
 		if(App.BUMPER) {
 			this.bumper.show();
@@ -63,4 +63,4 @@ export default class App {
 	}
 }
 
-App.BUMPER = false;
+App.BUMPER = true;
