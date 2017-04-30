@@ -49,6 +49,12 @@ export default class StagePlay extends PIXI.Container {
 		this.crashedTextGuide.anchor.y = -0.9;
 		this.crashedTextGuide.visible = false;
 
+		this.quideText = new PIXI.Text("hold ◀ and ▶ to control train speed, ▲ and ▼ for railroad switches", new PIXI.TextStyle({fontSize: 12, fill: '#9FBC12'}));
+		this.quideText.x = this.settings.width / 2;
+		this.quideText.y = 0;
+		this.quideText.anchor.x = 0.5;
+		this.quideText.anchor.y = -1.0;
+
 		this.addChild(this.background);
 		this.addChild(this.switchCursor);
 		this.addChild(this.world);
@@ -56,6 +62,7 @@ export default class StagePlay extends PIXI.Container {
 		this.addChild(this.scoreText);
 		this.addChild(this.crashedText);
 		this.addChild(this.crashedTextGuide);
+		this.addChild(this.quideText);
 
 		this.keyUp = new KeyListener(38);
 		this.keyDown = new KeyListener(40);
@@ -118,6 +125,10 @@ export default class StagePlay extends PIXI.Container {
 				}
 			}
 		}
+
+		if(this.quideText.alpha > 0 && (this.keyUp.isDown || this.keyDown.isDown || this.keyLeft.isDown || this.keyRight.isDown)) {
+			this.quideText.alpha -= 0.01;
+		}
 		
 		this.cartsText.text = this.train.getCartCount();
 		var score = Math.floor(this.train.locomotive.x / (World.PIECE_WIDTH * StagePlay.SCORE_SPEED));
@@ -168,6 +179,7 @@ export default class StagePlay extends PIXI.Container {
 		this.removeChild(this.scoreText);
 		this.removeChild(this.crashedText);
 		this.removeChild(this.crashedTextGuide);
+		this.removeChild(this.quideText);
 		
 		this.keyUp.close();
 		this.keyDown.close();
@@ -189,6 +201,7 @@ export default class StagePlay extends PIXI.Container {
 		this.scoreText = undefined;
 		this.crashedText = undefined;
 		this.crashedTextGuide = undefined;
+		this.quideText = undefined;
 	}
 }
 

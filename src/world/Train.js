@@ -19,7 +19,7 @@ export default class Train extends PIXI.Container {
 			color = Train.PLAYER_COLOR;
 		}
 		this.color = chroma(color).num();
-		this.colorDark = chroma(color).darken(1).num();
+		this.colorDark = chroma(color).brighten(1).num();
 
 		this.addCart();
 

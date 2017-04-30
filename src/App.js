@@ -28,7 +28,7 @@ export default class App {
 		
 		this.stages.addStage("play", new StagePlay(this.stages, settings));
 		this.stages.addStage("topScore", new StageTopScore(this.stages, this.topScore, settings));
-		this.stages.changeStage("play");
+		this.stages.changeStage("topScore");
 
 		if(App.BUMPER) {
 			this.bumper.show();
