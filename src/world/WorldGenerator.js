@@ -183,4 +183,4 @@ export default class WorldGenerator {
 	}
 }
 
-WorldGenerator.EMPTY_CART_PROBABILITY = 0.09;
+WorldGenerator.EMPTY_CART_PROBABILITY = 0.1;

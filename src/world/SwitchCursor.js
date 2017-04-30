@@ -65,7 +65,7 @@ export default class SwitchCursor extends PIXI.Container {
 	displayPath() {
 		this.path.clear();
 		
-		this.path.lineStyle(7, SwitchCursor.CURSOR_COLOR, 0.8);
+		this.path.lineStyle(7, 0xE1303C, 0.5);
 		this.path.moveTo(World.PIECE_WIDTH, World.PIECE_HEIGHT2);
 		for (var i=0; i < this.train.path.length; i++) {
 			this.path.lineTo(World.PIECE_WIDTH * i + World.PIECE_WIDTH2, World.PIECE_HEIGHT * this.train.path[i] + World.PIECE_HEIGHT2);
