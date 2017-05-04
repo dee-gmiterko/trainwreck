@@ -11,6 +11,12 @@ export default class TopScore {
 		this.topScore.push(score);
 		this.topScore.sort((a, b) => {return parseInt(b, 10) - parseInt(a, 10)});
 		window.localStorage.topScore = JSON.stringify(this.topScore);
+
+		if(window.ga) {
+			ga('send', 'event', 'Game', 'score', {
+				"metric5": score
+			});
+		}
 	}
 
 	getTop(count) {
