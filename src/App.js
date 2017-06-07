@@ -25,7 +25,7 @@ export default class App {
 		};
 
 		this.bumper = new Bumper(bumperClose);
-		
+
 		this.stages.addStage("play", new StagePlay(this.stages, settings));
 		this.stages.addStage("topScore", new StageTopScore(this.stages, this.topScore, settings));
 		this.stages.changeStage("play");
@@ -57,9 +57,8 @@ export default class App {
 			}
 		}
 
-		PIXI.loader
-		.add("images/anyImage.png")
-		.load(setup);
+		//PIXI.loader...load(setup);
+		setup();
 	}
 }
 

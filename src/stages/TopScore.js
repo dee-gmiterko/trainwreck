@@ -21,7 +21,7 @@ export default class StageTopScore extends PIXI.Container {
 		this.background = new PIXI.Graphics();
 		this.background.beginFill(StageTopScore.BACKGROUND_COLOR);
 		this.background.drawRect(0, 0, this.settings.width, this.settings.height);
-		
+
 		this.scores = new PIXI.Container();
 		var i = 0;
 		this.topScore.getTop(StageTopScore.TOP_COUNT).forEach(score => {
@@ -43,18 +43,24 @@ export default class StageTopScore extends PIXI.Container {
 			this.scores.addChild(scoreText);
 			i++;
 		});
-		
+
 		this.crashedTextGuide = new PIXI.Text("Press space to continue", new PIXI.TextStyle({fontSize: 14, fill: '#9FBC12'}));
 		this.crashedTextGuide.x = this.settings.width / 2;
 		this.crashedTextGuide.y = this.settings.height - 16;
 		this.crashedTextGuide.anchor.x = 0.5;
 		this.crashedTextGuide.anchor.y = 1;
 
-		this.gameByText = new PIXI.Text("Game by Dominik Gmiterko", new PIXI.TextStyle({fontSize: 10, fill: '#9FBC12'}));
+		this.gameByText = new PIXI.Text("Game by Ienze (Dominik Gmiterko)", new PIXI.TextStyle({fontSize: 10, fill: '#9FBC12'}));
 		this.gameByText.x = 16;
 		this.gameByText.y = this.settings.height - 16;
 		this.gameByText.anchor.x = 0.0;
 		this.gameByText.anchor.y = 1.0;
+		this.gameByText.interactive = true;
+		this.gameByText.buttonMode = true;
+		this.gameByText.click = () => {
+			var win = window.open("http://ienze.me", '_blank');
+  		win.focus();
+		}
 
 		this.gameAtText = new PIXI.Text("play at ienze.me/trainwreck", new PIXI.TextStyle({fontSize: 10, fill: '#9FBC12'}));
 		this.gameAtText.x = this.settings.width - 16;
@@ -83,7 +89,7 @@ export default class StageTopScore extends PIXI.Container {
 		this.removeChild(this.crashedTextGuide);
 		this.removeChild(this.gameByText);
 		this.removeChild(this.gameAtText);
-		
+
 		this.keySpace.close();
 
 		this.keySpace = undefined;
