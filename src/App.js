@@ -62,4 +62,4 @@ export default class App {
 	}
 }
 
-App.BUMPER = true;
+App.BUMPER = false;
