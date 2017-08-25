@@ -15,10 +15,10 @@ export default class WorldGenerator {
 		this.initGenarator();
 	}
 
-	
+
 	generateNext(width) {
 		var half = Math.floor(width / 2);
-		
+
 		var rails = {};
 		for(var i=-half; i<=half; i++) {
 			rails[i] = new RailPiece();
@@ -142,39 +142,6 @@ export default class WorldGenerator {
 				}
 			}, 3);
 
-	/*
-		//backsplit up
-		addRailType({
-			canUse: (railsBefore, rails, railIndex) => {
-				return rails[railIndex] !== undefined
-					&& railsBefore[railIndex + 1] !== undefined
-					//max one switch
-					&& railsBefore[railIndex + 1].railsCount() <= 2
-					&& railsBefore[railIndex].railsCount() <= 2
-					&& rails[railIndex].railsCount() <= 2;
-			},
-			use: (railsBefore, rails, railIndex) => {
-				this.connectRails(railsBefore[railIndex + 1], railIndex + 1, rails[railIndex], railIndex);
-				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
-			}
-		}, 2);
-
-		//backsplit down
-		addRailType({
-			canUse: (railsBefore, rails, railIndex) => {
-				return rails[railIndex] !== undefined
-					&& railsBefore[railIndex - 1] !== undefined
-					//max one switch
-					&& railsBefore[railIndex - 1].railsCount() <= 2
-					&& railsBefore[railIndex].railsCount() <= 2
-					&& rails[railIndex].railsCount() <= 2;
-			},
-			use: (railsBefore, rails, railIndex) => {
-				this.connectRails(railsBefore[railIndex - 1], railIndex - 1, rails[railIndex], railIndex);
-				this.connectRails(railsBefore[railIndex], railIndex, rails[railIndex], railIndex);
-			}
-		}, 2);
-*/
 	}
 
 	connectRails(railA, indexA, railB, indexB) {
