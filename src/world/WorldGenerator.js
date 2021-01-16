@@ -15,7 +15,6 @@ export default class WorldGenerator {
 		this.initGenarator();
 	}
 
-
 	generateNext(width) {
 		var half = Math.floor(width / 2);
 

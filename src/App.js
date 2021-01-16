@@ -3,7 +3,6 @@ import StagePlay from './stages/Play';
 import StageTopScore from './stages/TopScore';
 
 import TopScore from './common/TopScore';
-import Bumper from './common/Bumper';
 import KeyListener from './common/KeyListener';
 
 export default class App {
@@ -13,30 +12,11 @@ export default class App {
 		this.stages = new Stages();
 		this.topScore = new TopScore();
 
-		var bumperClose = () => {
-			if(this.run) {
-				return;
-			}
-			this.run = true;
-			if(this.setuped) {
-				this.gameLoop();
-			}
-			this.bumper.hide();
-		};
-
-		this.bumper = new Bumper(bumperClose);
-
 		this.stages.addStage("play", new StagePlay(this.stages, settings));
 		this.stages.addStage("topScore", new StageTopScore(this.stages, this.topScore, settings));
 		this.stages.changeStage("play");
 
-		if(App.BUMPER) {
-			this.bumper.show();
-		} else {
-			this.run = true;
-		}
-
-		new KeyListener(32, bumperClose);
+		this.run = true;
 	}
 
 	start() {
@@ -61,5 +41,3 @@ export default class App {
 		setup();
 	}
 }
-
-App.BUMPER = false;

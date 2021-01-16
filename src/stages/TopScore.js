@@ -18,6 +18,8 @@ export default class StageTopScore extends PIXI.Container {
 	}
 
 	load() {
+		let s = this.settings.scale;
+
 		this.background = new PIXI.Graphics();
 		this.background.beginFill(StageTopScore.BACKGROUND_COLOR);
 		this.background.drawRect(0, 0, this.settings.width, this.settings.height);
@@ -34,7 +36,10 @@ export default class StageTopScore extends PIXI.Container {
 				color = '#9FBC12';
 			}
 
-			var scoreText = new PIXI.Text(score, new PIXI.TextStyle({fontSize: 14, fill: color}));
+			var scoreText = new PIXI.Text(
+				score,
+				new PIXI.TextStyle({fontSize: 14 * s, fill: color})
+			);
 			scoreText.x = (x+1) * (this.settings.width / (10 + 1));
 			scoreText.y = (y+1) * (this.settings.height / (5 + 1));
 			scoreText.anchor.x = 0.5;
@@ -44,15 +49,21 @@ export default class StageTopScore extends PIXI.Container {
 			i++;
 		});
 
-		this.crashedTextGuide = new PIXI.Text("Press space to continue", new PIXI.TextStyle({fontSize: 14, fill: '#9FBC12'}));
+		this.crashedTextGuide = new PIXI.Text(
+			"Press space to continue",
+			new PIXI.TextStyle({fontSize: 14 * s, fill: '#9FBC12'})
+		);
 		this.crashedTextGuide.x = this.settings.width / 2;
-		this.crashedTextGuide.y = this.settings.height - 16;
+		this.crashedTextGuide.y = this.settings.height - 8 * s;
 		this.crashedTextGuide.anchor.x = 0.5;
 		this.crashedTextGuide.anchor.y = 1;
 
-		this.gameByText = new PIXI.Text("Game by Ienze (Dominik Gmiterko)", new PIXI.TextStyle({fontSize: 10, fill: '#9FBC12'}));
-		this.gameByText.x = 16;
-		this.gameByText.y = this.settings.height - 16;
+		this.gameByText = new PIXI.Text(
+			"Game by Ienze (Dominik Gmiterko)",
+			new PIXI.TextStyle({fontSize: 10 * s, fill: '#9FBC12'})
+		);
+		this.gameByText.x = 8 * s;
+		this.gameByText.y = this.settings.height - 8 * s;
 		this.gameByText.anchor.x = 0.0;
 		this.gameByText.anchor.y = 1.0;
 		this.gameByText.interactive = true;
@@ -62,9 +73,12 @@ export default class StageTopScore extends PIXI.Container {
   		win.focus();
 		}
 
-		this.gameAtText = new PIXI.Text("play at ienze.me/trainwreck", new PIXI.TextStyle({fontSize: 10, fill: '#9FBC12'}));
-		this.gameAtText.x = this.settings.width - 16;
-		this.gameAtText.y = this.settings.height - 16;
+		this.gameAtText = new PIXI.Text(
+			"play at ienze.me/trainwreck",
+			new PIXI.TextStyle({fontSize: 10 * s, fill: '#9FBC12'})
+		);
+		this.gameAtText.x = this.settings.width - 8 * s;
+		this.gameAtText.y = this.settings.height - 8 * s;
 		this.gameAtText.anchor.x = 1.0;
 		this.gameAtText.anchor.y = 1.0;
 

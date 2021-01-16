@@ -1,8 +1,9 @@
 import App from './App';
 
 var settings = {
-	width: 960,
-	height: 144
+	width: window.innerWidth,
+	height: window.innerHeight,
+	scale: Math.min(window.innerWidth / 700, window.innerHeight / 400)
 }
 
 window.app = new App(settings);
