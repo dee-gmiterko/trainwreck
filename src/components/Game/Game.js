@@ -7,7 +7,6 @@ import store from "../../game/store";
 import { Provider } from "react-redux";
 
 const Game = () => {
-  const viewportRef = useRef();
   const [width, setWidth] = useState(window.innerWidth);
   const [height, setHeight] = useState(window.innerHeight);
 
@@ -33,7 +32,7 @@ const Game = () => {
       resolution: 2,
     }}>
       <Provider store={store}>
-        <Viewport width={width} height={height} ref={viewportRef}>
+        <Viewport width={width} height={height}>
           <Trainwreck />
         </Viewport>
       </Provider>

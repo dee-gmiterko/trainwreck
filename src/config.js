@@ -9,6 +9,9 @@ export const EMPTY_CART_PROBABILITY = 0.1;
 export const SUBPIECES = 16;
 export const TRACK_WIDTH2 = 2;
 export const TRACK_TIE_WIDTH2 = 3;
+export const MIN_ZOOM = 0.4;
+export const MAX_ZOOM = 1.0;
+export const VIEW_CENTER_ON = 0.3;
 
 export const EMPTY_CART_COLOR = 0x9FBC12;
 export const RAIL_COLOR = 0xE1303C;

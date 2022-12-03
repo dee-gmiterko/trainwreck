@@ -49,12 +49,14 @@ export const behavior = {
     return instance;
   },
   customApplyProps: (instance, oldProps, newProps) => {
-    const { cart } = newProps;
+    const { train, cart } = newProps;
     const { x, y, rotation, skew } = cart;
     instance.x = x;
     instance.y = y;
     instance.rotation = rotation;
-    instance.children[0].y = -config.CART_HEIGHT2 - skew;
+    instance.children[0].y = -config.CART_HEIGHT2 - (
+      skew * Math.min(1, Math.sqrt(train.speed))
+    );
   }
 };
 export default CustomPIXIComponent(behavior, TYPE);
