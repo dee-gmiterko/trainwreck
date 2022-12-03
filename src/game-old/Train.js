@@ -1,22 +1,21 @@
 import chroma from 'chroma-js';
-import World from './World';
+import * as config from "../config";
 
-export default class Train extends PIXI.Container {
+export default class Train {
 
 	constructor(world, x, y, direction, enemy) {
-		super();
 
 		this.world = world;
 		this.direction = direction;
-		this.speed = Train.INITIAL_SPEED;
+		this.speed = config.INITIAL_SPEED;
 		this.isCrashed = false;
 
-		this.amEnemy = enemy;
+		this.isEnemy = enemy;
 		var color;
 		if(enemy) {
-			color = Train.ENEMY_COLOR;
+			color = config.ENEMY_COLOR;
 		} else {
-			color = Train.PLAYER_COLOR;
+			color = config.PLAYER_COLOR;
 		}
 		this.color = chroma(color).num();
 		this.colorDark = chroma(color).darken(0.5).num();
@@ -24,40 +23,40 @@ export default class Train extends PIXI.Container {
 		this.addCart();
 
 		this.locomotive = this.children[0];
-		this.locomotive.x = x * World.PIECE_WIDTH + World.PIECE_WIDTH * this.direction;
-		this.locomotive.y = y * World.PIECE_HEIGHT;
+		this.locomotive.x = x * config.PIECE_WIDTH + config.PIECE_WIDTH * this.direction;
+		this.locomotive.y = y * config.PIECE_HEIGHT;
 
 		this.path = this.world.getPath(x, y, this.direction);
 	}
 
 	move() {
-		var pieceX = Math.floor(this.locomotive.x / World.PIECE_WIDTH);
+		var pieceX = Math.floor(this.locomotive.x / config.PIECE_WIDTH);
 
 		if(!this.isCrashed && this.path[pieceX] !== undefined) {
 
-			if(this.speed > Train.INITIAL_SPEED) {
-				this.speed -= Train.FRICTION;
+			if(this.speed > config.INITIAL_SPEED) {
+				this.speed -= config.FRICTION;
 			}
 
 			var getY = (x) => {
 				if(x < 0) {
 					return 0;
 				}
-				var y1 = World.PIECE_HEIGHT * this.path[Math.floor(x / World.PIECE_WIDTH)];
-				var y2 = World.PIECE_HEIGHT * this.path[Math.floor(x / World.PIECE_WIDTH) + 1];
+				var y1 = config.PIECE_HEIGHT * this.path[Math.floor(x / config.PIECE_WIDTH)];
+				var y2 = config.PIECE_HEIGHT * this.path[Math.floor(x / config.PIECE_WIDTH) + 1];
 				if(Object.is(y2, NaN)) {
 					y2 = y1;
 				}
-				var t = (x % World.PIECE_WIDTH) / World.PIECE_WIDTH;
+				var t = (x % config.PIECE_WIDTH) / config.PIECE_WIDTH;
 				return y1 + t * (y2 - y1);
 			}
 			var getAngle = (x) => {
 				if(x < 0) {
 					return 0;
 				}
-				var y1 = getY(x - Train.CART_WIDTH2);
-				var y2 = getY(x + Train.CART_WIDTH2);
-				return Math.atan((y2 - y1) / Train.CART_WIDTH);
+				var y1 = getY(x - config.CART_WIDTH2);
+				var y2 = getY(x + config.CART_WIDTH2);
+				return Math.atan((y2 - y1) / config.CART_WIDTH);
 			}
 
 			//move locomotive
@@ -66,7 +65,7 @@ export default class Train extends PIXI.Container {
 			this.locomotive.rotation = getAngle(this.locomotive.x);
 
 			//check for cart on rail
-			var checkPieceX = Math.round(this.locomotive.x / World.PIECE_WIDTH);
+			var checkPieceX = Math.round(this.locomotive.x / config.PIECE_WIDTH);
 			var checkPieceY = this.path[checkPieceX];
 			if(this.world.rails[checkPieceX] && this.world.rails[checkPieceX][checkPieceY] && this.world.rails[checkPieceX][checkPieceY].isCart) {
 				this.addCart();
@@ -78,7 +77,7 @@ export default class Train extends PIXI.Container {
 			for(let i = 1; i < this.children.length; i++) {
 				let dx = this.children[i].x - this.children[i-1].x;
 				let dy = this.children[i].y - this.children[i-1].y;
-				let l= Train.CART_DELAY / Math.sqrt(dx * dx + dy * dy);
+				let l= config.CART_DELAY / Math.sqrt(dx * dx + dy * dy);
 				dx *= l;
 				dy *= l;
 				this.children[i].x = this.children[i-1].x + dx;
@@ -87,12 +86,12 @@ export default class Train extends PIXI.Container {
 
 				var skew = this.children[i].y - getY(this.children[i].x);
 
-				if(Math.abs(skew) > Train.CART_MAX_SKEW) {
-					this.children[i].y = getY(this.children[i].x) + Math.sign(skew) * Train.CART_MAX_SKEW;
-					skew = Math.sign(skew) * Train.CART_MAX_SKEW;
+				if(Math.abs(skew) > config.CART_MAX_SKEW) {
+					this.children[i].y = getY(this.children[i].x) + Math.sign(skew) * config.CART_MAX_SKEW;
+					skew = Math.sign(skew) * config.CART_MAX_SKEW;
 				}
 
-				this.children[i].children[0].y = -Train.CART_HEIGHT2 - skew;
+				this.children[i].children[0].y = -config.CART_HEIGHT2 - skew;
 			}
 
 			//test other train collision
@@ -103,13 +102,13 @@ export default class Train extends PIXI.Container {
 				if(train.isCrashed) {
 					return;
 				}
-				if(this.amEnemy === train.amEnemy) {
+				if(this.isEnemy === train.isEnemy) {
 					return;
 				}
 				train.children.forEach(cart => {
 					var dx = cart.x - this.locomotive.x;
 					var dy = cart.y - this.locomotive.y;
-					if(Math.sqrt(dx*dx+dy*dy) < (this.amEnemy ? Train.TRAIN_CRASH_DISTANCE * 0.81 : Train.TRAIN_CRASH_DISTANCE)) {
+					if(Math.sqrt(dx*dx+dy*dy) < (this.isEnemy ? config.TRAIN_CRASH_DISTANCE * 0.81 : config.TRAIN_CRASH_DISTANCE)) {
 
 						let meCarts = this.children.length - train.children.length;
 						let itCarts = train.children.length - this.children.length;
@@ -151,7 +150,7 @@ export default class Train extends PIXI.Container {
 			}
 
 			//move locomotive
-			this.speed *= Train.FRICTION_CRASHED_MOD;
+			this.speed *= config.FRICTION_CRASHED_MOD;
 			this.locomotive.rotation += Math.min(3, this.speed) * (Math.random() - 0.5) * 0.2;
 			this.locomotive.x += this.speed * Math.cos(this.locomotive.rotation);
 			this.locomotive.y += this.speed * Math.sin(this.locomotive.rotation);
@@ -160,7 +159,7 @@ export default class Train extends PIXI.Container {
 			for(let i = 1; i < this.children.length; i++) {
 				let dx = this.children[i].x - this.children[i-1].x;
 				let dy = this.children[i].y - this.children[i-1].y;
-				let l = Train.CART_DELAY / Math.sqrt(dx * dx + dy * dy);
+				let l = config.CART_DELAY / Math.sqrt(dx * dx + dy * dy);
 				dx *= l;
 				dy *= l;
 				this.children[i].x = this.children[i-1].x + dx;
@@ -177,7 +176,7 @@ export default class Train extends PIXI.Container {
 
 		this.isCrashed = true;
 
-		if(this.amEnemy) {
+		if(this.isEnemy) {
 			setTimeout(() => {this.world.trains.removeChild(this)}, 3000);
 		}
 	}
@@ -186,24 +185,24 @@ export default class Train extends PIXI.Container {
 		var cartContainer = new PIXI.Sprite();
 
 		var cartBottom = new PIXI.Graphics();
-		cartBottom.width = Train.CART_WIDTH;
-		cartBottom.height = Train.CART_HEIGHT;
+		cartBottom.width = config.CART_WIDTH;
+		cartBottom.height = config.CART_HEIGHT;
 		cartBottom.beginFill(this.colorDark);
-		cartBottom.drawRect(0, 0, Train.CART_WIDTH, Train.CART_HEIGHT);
+		cartBottom.drawRect(0, 0, config.CART_WIDTH, config.CART_HEIGHT);
 
-		cartBottom.x = -Train.CART_WIDTH2;
-		cartBottom.y = -Train.CART_HEIGHT2;
+		cartBottom.x = -config.CART_WIDTH2;
+		cartBottom.y = -config.CART_HEIGHT2;
 
 		cartContainer.addChild(cartBottom);
 
 		var cartTop = new PIXI.Graphics();
-		cartTop.width = Train.CART_WIDTH;
-		cartTop.height = Train.CART_HEIGHT;
+		cartTop.width = config.CART_WIDTH;
+		cartTop.height = config.CART_HEIGHT;
 		cartTop.beginFill(this.color);
-		cartTop.drawRect(0, 0, Train.CART_WIDTH, Train.CART_HEIGHT);
+		cartTop.drawRect(0, 0, config.CART_WIDTH, config.CART_HEIGHT);
 
-		cartTop.x = -Train.CART_WIDTH2;
-		cartTop.y = -Train.CART_HEIGHT2;
+		cartTop.x = -config.CART_WIDTH2;
+		cartTop.y = -config.CART_HEIGHT2;
 
 		cartContainer.addChild(cartTop);
 
@@ -228,7 +227,7 @@ export default class Train extends PIXI.Container {
 
 	recalculatePath(from) {
 		if(from === undefined) {
-			from = Math.floor(this.children[0].x / World.PIECE_WIDTH);
+			from = Math.floor(this.children[0].x / config.PIECE_WIDTH);
 		}
 		this.world.getPath(from, this.path[from], this.direction, this.path);
 	}
@@ -238,35 +237,14 @@ export default class Train extends PIXI.Container {
 	}
 
 	accelerate() {
-		if(Train.MAX_SPEED === undefined || this.speed < Train.MAX_SPEED) {
-			this.speed += Train.SPEED_CHANGE_BASE * Math.pow(Train.SPEED_CHANGE_DROP_PER_CART, this.getCartCount());
+		if(config.MAX_SPEED === undefined || this.speed < config.MAX_SPEED) {
+			this.speed += config.SPEED_CHANGE_BASE * Math.pow(config.SPEED_CHANGE_DROP_PER_CART, this.getCartCount());
 		}
 	}
 
 	decelerate() {
-		if(Train.MIN_SPEED === undefined || this.speed > Train.MIN_SPEED) {
-			this.speed -= Train.SPEED_CHANGE_BASE * Math.pow(Train.SPEED_CHANGE_DROP_PER_CART, this.getCartCount());
+		if(config.MIN_SPEED === undefined || this.speed > config.MIN_SPEED) {
+			this.speed -= config.SPEED_CHANGE_BASE * Math.pow(config.SPEED_CHANGE_DROP_PER_CART, this.getCartCount());
 		}
 	}
 }
-
-Train.LEFT = -1;
-Train.RIGHT = 1;
-
-Train.CART_WIDTH = 30;
-Train.CART_HEIGHT = 10;
-Train.CART_WIDTH2 = Train.CART_WIDTH / 2;
-Train.CART_HEIGHT2 = Train.CART_HEIGHT / 2;
-Train.CART_DELAY = 32;
-Train.CART_MAX_SKEW = Train.CART_HEIGHT / 3;
-Train.INITIAL_SPEED = 1.0;
-Train.SPEED_CHANGE_BASE = 0.1;
-Train.SPEED_CHANGE_DROP_PER_CART = 0.74;
-Train.FRICTION = 0.003;
-Train.FRICTION_CRASHED_MOD = 0.92;
-Train.MIN_SPEED = 0;
-Train.MAX_SPEED = undefined;
-Train.TRAIN_CRASH_DISTANCE = Train.CART_WIDTH / 3;
-
-Train.ENEMY_COLOR = '#247192';
-Train.PLAYER_COLOR = '#9FBC12';

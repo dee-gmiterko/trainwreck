@@ -1,4 +1,4 @@
-import Train from './Train';
+import * as config from '../config';
 
 export default class RailPiece {
 
@@ -41,28 +41,8 @@ export default class RailPiece {
 		return this.to.indexOf(railIndex) >= 0;
 	}
 
-	getTo() {
-		if(this.isSwitch) {
-			return this.to[this.switched.to];
-		}
-		if(this.to.length > 0) {
-			return this.to[0];
-		}
-		return undefined;
-	}
-
-	getFrom() {
-		if(this.isSwitch) {
-			return this.from[this.switched.from];
-		}
-		if(this.from.length > 0) {
-			return this.from[0];
-		}
-		return undefined;
-	}
-
 	switchPrefered(preferedDirection, value) {
-		if(preferedDirection === Train.RIGHT) {
+		if(preferedDirection === config.RIGHT) {
 			if(this.to.length >= 2) {
 				this.switchTo(value);
 			} else {
@@ -87,5 +67,16 @@ export default class RailPiece {
 
 	railsCount() {
 		return this.from.length + this.to.length
+	}
+
+	getData() {
+		return {
+			to: this.to,
+			from: this.from,
+			isSwitch: this.isSwitch,
+			isEmpty: this.isEmpty,
+			isCart: this.isCart,
+			switched: this.switched,
+		}
 	}
 }
