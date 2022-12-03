@@ -6,23 +6,27 @@ export const trainsSlice = createSlice({
   name: 'trains',
   initialState: {
     trains: [],
+    controlCounter: 0,
   },
   reducers: {
     addTrain: (state, action) => {
-      const vals = action.payload;
+      const {clear, direction, speed, isEnemy, x, y, path} = action.payload;
+      if(clear) {
+        state.trains = [];
+      }
       state.trains.push({
-        direction: vals.direction || config.RIGHT,
-        speed: vals.speed || config.INITIAL_SPEED,
+        direction: direction || config.RIGHT,
+        speed: speed || config.INITIAL_SPEED,
         isCrashed: false,
-        isEnemy: vals.isEnemy || false,
+        isEnemy: isEnemy || false,
         carts: [
           {
-            x: (vals.x || 0) * config.PIECE_WIDTH + config.PIECE_WIDTH2 * (vals.direction || config.RIGHT),
-        		y: (vals.y || 0) * config.PIECE_HEIGHT,
+            x: (x || 0) * config.PIECE_WIDTH + config.PIECE_WIDTH2 * (direction || config.RIGHT),
+        		y: (y || 0) * config.PIECE_HEIGHT,
             rotation: 0,
           }
         ],
-        path: vals.path,
+        path: path,
       })
     },
     addCart: (state, action) => {
@@ -77,6 +81,9 @@ export const trainsSlice = createSlice({
     adjustSpeed: (state, action) => {
       const {train, speed} = action.payload;
       state.trains[train].speed = speed;
+    },
+    increseControlCounter: (state, action) => {
+      state.controlCounter += 1;
     }
   },
 })
@@ -89,10 +96,17 @@ export const {
   moveCart,
   trainCrashed,
   adjustSpeed,
+  increseControlCounter,
 } = trainsSlice.actions;
 
 export const selectTrains = (state) => state.trains.trains;
+export const selectControlCounter = (state) => state.trains.controlCounter;
 export const selectTrain = (state) => selectTrains(state)[0];
 export const selectEnemies = (state) => selectTrains(state).slice(1);
-
+export const selectCartsCount = (state) => (selectTrain(state)?.carts.length - 1) || 0;
+export const selectScore = (state) => (
+  Math.floor((selectTrain(state)?.carts[0].x || 0) / (config.PIECE_WIDTH * config.SCORE_SPEED))
+)
+export const selectCrashed = (state) => selectTrain(state)?.isCrashed;
+export const selectGuideVisibility = (state) => Math.max(0, 100-selectControlCounter(state)) / 100;
 export default trainsSlice.reducer;

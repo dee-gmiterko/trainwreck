@@ -1,8 +1,23 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
 import WorldGenerator from "./WorldGenerator";
 import { setRails, selectIsEmptyCart, removeEmptyCart, selectPath } from "./railwayYardSlice";
-import { addTrain, selectTrains, selectTrain, moveCart, addCart, setCarts, trainCrashed, adjustSpeed } from "./trainsSlice";
+import { addTrain, selectTrains, selectTrain, selectScore, moveCart, addCart, setCarts, trainCrashed, adjustSpeed } from "./trainsSlice";
+// import { addScore } from ""
 import * as config from "../config";
+
+const restart = () => {
+  return function (dispatch, getState) {
+    const state = getState();
+    const score = selectScore(state);
+    if(score > 10) {
+      // dispatch(addScore({
+      //   score
+      // }));
+    }
+    dispatch(generateRailwayYard(60));
+    dispatch(respawnPlayerTrain({x: 0, y:0}));
+  }
+}
 
 const generateRailwayYard = (size) => {
   return function (dispatch, getState) {
@@ -14,12 +29,13 @@ const generateRailwayYard = (size) => {
   }
 }
 
-const spawnTrain = ({x, y, direction, ...vals}) => {
+const respawnPlayerTrain = ({x, y}) => {
   return function (dispatch, getState) {
     const state = getState();
-    const path = selectPath(state, parseInt(x), parseInt(y), direction || config.RIGHT);
+    const path = selectPath(state, parseInt(x), parseInt(y), config.RIGHT);
     dispatch(addTrain({
-      x, y, path, ...vals,
+      clear: true,
+      x, y, path,
     }));
   }
 }
@@ -248,8 +264,8 @@ const decelerate = () => {
 }
 
 export {
+  restart,
   generateRailwayYard,
-  spawnTrain,
   moveTrains,
   accelerate,
   decelerate,

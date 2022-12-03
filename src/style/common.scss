@@ -5,3 +5,61 @@ body, html {
   height: 100%;
   overflow: hidden;
 }
+
+.overlay {
+  position: fixed;
+  top: 16px; right: 16px; bottom: 16px; left: 16px;
+  pointer-events: none;
+  font-family: sans-serif;
+
+  > div {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+  }
+
+  .v-top {
+    top: 0;
+  }
+
+  .v-center {
+    align-items: center;
+    height: 100%;
+  }
+
+  .v-bottom {
+    bottom: 0;
+  }
+
+  .h-left {
+    left: 0;
+  }
+
+  .h-center {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .h-right {
+    right: 0;
+  }
+
+  .v-center.h-center {
+    flex-direction: column;
+  }
+
+  .carts, .score {
+    font-size: 32pt;
+    color: #9FBC12;
+  }
+
+  .title {
+    font-size: 72pt;
+    color: #247192;
+  }
+
+  .hint {
+    font-size: 20pt;
+    color: #247192;
+  }
+}

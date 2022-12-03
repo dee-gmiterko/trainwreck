@@ -45,7 +45,7 @@ export default ({width, height, children}) => {
   let x, y, zoom;
   if(train) {
     zoom = 1 / (config.MIN_ZOOM + Math.atan(train.speed / 30) * config.MAX_ZOOM);
-    x = train.carts[0].x + config.VIEW_CENTER_ON * width / zoom;
+    x = train.carts[0].x + config.CAMERA_CENTER_PERC * width / zoom;
     y = train.carts[0].y;
   }
 
