@@ -8,7 +8,8 @@ import { usePixiTicker } from "react-pixi-fiber";
 import { useDispatch, useSelector } from "react-redux";
 import { selectRails, selectCursor } from "../../game/railwayYardSlice";
 import { selectTrain, selectEnemies, increseControlCounter } from "../../game/trainsSlice";
-import { restart, moveTrains, updateCursor, accelerate, decelerate, switchRail } from "../../game/actions";
+import { restart, moveTrains, updateCursor, accelerate, decelerate, switchRail, spawnEnemies } from "../../game/actions";
+import { fillLeaderboard } from "../../game/leaderboardSlice";
 import { utils } from 'pixi.js';
 
 const Trainwreck = () => {
@@ -37,12 +38,14 @@ const Trainwreck = () => {
 
   useEffect(() => {
     dispatch(restart());
+    dispatch(fillLeaderboard());
   }, [])
 
   usePixiTicker((delta) => {
     // TODO, use delta for realtime physics
     dispatch(moveTrains());
     dispatch(updateCursor());
+    dispatch(spawnEnemies());
 
     if(keyListeners && train) {
       if (!train.isCrashed) {
@@ -80,7 +83,11 @@ const Trainwreck = () => {
   return (
     <>
       {rails && (
-        <RailwayYard rails={rails} cursor={cursor} />
+        <RailwayYard
+          rails={rails}
+          switchCursor={cursor}
+          switchPath={train && train.path}
+        />
       )}
       {train && (
         <Train train={train} />

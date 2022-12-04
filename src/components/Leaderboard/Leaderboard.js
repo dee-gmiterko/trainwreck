@@ -1,17 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { selectLeaderboard, fillLeaderboard } from "../../game/leaderboardSlice";
-import { utils } from 'pixi.js';
+import { useSelector } from "react-redux";
+import { selectLeaderboard } from "../../game/leaderboardSlice";
 
 const Leaderboard = ({ size, score }) => {
-  const dispatch = useDispatch();
   const leaderboard = useSelector(state => selectLeaderboard(state, size || 10, score));
-
-  useEffect(() => {
-    if(leaderboard.length <= 3) {
-      dispatch(fillLeaderboard());
-    }
-  }, [leaderboard.length])
 
   return (
     <table className="leaderboard">

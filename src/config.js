@@ -39,7 +39,7 @@ export const ENEMY_COLOR = '#247192';
 export const PLAYER_COLOR = '#9FBC12';
 
 export const SCORE_SPEED = 3;
-export const ENEMY_SPAWN_RATE = 0.002;
+export const ENEMY_SPAWN_RATE = 0.003;
 export const ENEMY_SPAWN_CARTS_PROB = 0.2;
 export const ALLOW_MIDGAME_RESTART = false;
 

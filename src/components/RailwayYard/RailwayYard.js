@@ -2,8 +2,9 @@ import React from "react";
 import { Container } from "react-pixi-fiber";
 import Rail from "../Rail/Rail";
 import SwitchCursor from "../SwitchCursor/SwitchCursor";
+import SwitchPath from "../SwitchPath/SwitchPath";
 
-const RailwayYard = ({ rails, cursor }) => {
+const RailwayYard = ({ rails, switchCursor, switchPath }) => {
 
   return (
     <Container
@@ -14,8 +15,11 @@ const RailwayYard = ({ rails, cursor }) => {
           <Rail key={`${x}:${y}`} x={x} y={y} railPiece={railPiece} />
         ))
       )).flat(1)}
-      {cursor.x !== undefined && cursor.y !== undefined && (
-        <SwitchCursor x={cursor.x} y={cursor.y} />
+      {switchCursor.x !== undefined && switchCursor.y !== undefined && (
+        <SwitchCursor x={switchCursor.x} y={switchCursor.y} />
+      )}
+      {switchPath && (
+        <SwitchPath path={switchPath} />
       )}
     </Container>
   );

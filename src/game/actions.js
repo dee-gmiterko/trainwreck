@@ -1,6 +1,6 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
 import WorldGenerator from "./WorldGenerator";
-import { setRails, selectIsEmptyCart, removeEmptyCart, selectPath, selectIsSwitchTo, selectCursor, setCursor, setSwitch } from "./railwayYardSlice";
+import { setRails, selectRails, selectIsEmptyCart, removeEmptyCart, selectPath, selectIsSwitchTo, selectCursor, setCursor, setSwitch } from "./railwayYardSlice";
 import { addTrain, selectTrains, selectTrain, selectScore, moveCart, addCart, setCarts, trainCrashed, adjustSpeed, selectTrainLocation, updatePath } from "./trainsSlice";
 import { addScore } from "./leaderboardSlice";
 import * as config from "../config";
@@ -160,22 +160,15 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
             }))
           }
 
-          if(itCarts < 1) {
-            dispatch(setCarts({
-              train: otherIndex,
-              carts: 1,
-            }));
-            dispatch(trainCrashed({
-              train: otherIndex,
-              speed: Math.max(train.speed, otherTrain.speed),
-              bounce: true,
-            }));
-          } else {
-            dispatch(setCarts({
-              train: otherIndex,
-              carts: itCarts,
-            }));
-          }
+          dispatch(setCarts({
+            train: otherIndex,
+            carts: Math.max(1, itCarts),
+          }));
+          dispatch(trainCrashed({
+            train: otherIndex,
+            speed: Math.max(train.speed, otherTrain.speed),
+            bounce: true,
+          }));
         }
       });
     });
@@ -267,6 +260,32 @@ const updateCursor = () => {
   }
 }
 
+const spawnEnemies = () => {
+  return function (dispatch, getState) {
+    const state = getState();
+    const train = selectTrain(state);
+    const rails = selectRails(state);
+
+    if(Math.random() < config.ENEMY_SPAWN_RATE * train.speed) {
+      const x = Math.floor((
+        train.carts[0].x + 800 /* TODO dynamic spawn distance */
+      ) / config.PIECE_WIDTH);
+
+      if(rails[x]) {
+        const ys = Object.keys(rails[x]);
+        const y = parseInt(ys[Math.floor(Math.random()*ys.length)], 10);
+
+        const path = selectPath(state, x, y, config.LEFT);
+        dispatch(addTrain({
+          x, y, path,
+          direction: config.LEFT,
+          isEnemy: true,
+        }));
+      }
+    }
+  }
+}
+
 const accelerate = () => {
   return function (dispatch, getState) {
     const state = getState();
@@ -329,6 +348,7 @@ export {
   generateRailwayYard,
   moveTrains,
   updateCursor,
+  spawnEnemies,
   accelerate,
   decelerate,
   switchRail,

@@ -9,7 +9,7 @@ export const trainsSlice = createSlice({
   },
   reducers: {
     addTrain: (state, action) => {
-      const {clear, direction, speed, isEnemy, x, y, path} = action.payload;
+      const { clear, direction, speed, isEnemy, x, y, path } = action.payload;
       if(clear) {
         state.trains = [];
       }

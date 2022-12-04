@@ -71,7 +71,7 @@ export const selectLeaderboard = (state, size, aroundScore) => {
           {...a, order: 1+i}
         )),
         {user: "..."},
-        ...attempts.slice(myIndex-2, myIndex-2+size-4).map((a, i) => (
+        ...attempts.slice(myIndex-3, myIndex-3+size-4).map((a, i) => (
           {...a, order: myIndex-1+i, higlighted: myIndex === myIndex-2+i}
         )),
       ]
