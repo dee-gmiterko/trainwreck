@@ -1,5 +1,4 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
-import { selectPath } from "./railwayYardSlice";
 import * as config from "../config";
 
 export const trainsSlice = createSlice({
@@ -28,6 +27,10 @@ export const trainsSlice = createSlice({
         ],
         path: path,
       })
+    },
+    updatePath: (state, action) => {
+      const {train, path} = action.payload;
+      state.trains[train].path = path;
     },
     addCart: (state, action) => {
       const {train} = action.payload;
@@ -90,6 +93,7 @@ export const trainsSlice = createSlice({
 
 export const {
   addTrain,
+  updatePath,
   addCart,
   removeCart,
   setCarts,
@@ -104,9 +108,17 @@ export const selectControlCounter = (state) => state.trains.controlCounter;
 export const selectTrain = (state) => selectTrains(state)[0];
 export const selectEnemies = (state) => selectTrains(state).slice(1);
 export const selectCartsCount = (state) => (selectTrain(state)?.carts.length - 1) || 0;
+export const selectTrainLocation = (state) => {
+  const train = selectTrain(state);
+  return train && {
+    x: parseInt(train.carts[0].x / config.PIECE_WIDTH),
+    y: parseInt(train.carts[0].y / config.PIECE_HEIGHT),
+  }
+}
 export const selectScore = (state) => (
   Math.floor((selectTrain(state)?.carts[0].x || 0) / (config.PIECE_WIDTH * config.SCORE_SPEED))
 )
+export const selectSpeed = (state) => selectTrain(state)?.speed;
 export const selectCrashed = (state) => selectTrain(state)?.isCrashed;
 export const selectGuideVisibility = (state) => Math.max(0, 100-selectControlCounter(state)) / 100;
 export default trainsSlice.reducer;

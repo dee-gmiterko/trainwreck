@@ -6,14 +6,15 @@ import Viewport from "../Viewport/Viewport";
 import KeyListener from "../../game/KeyListener";
 import { usePixiTicker } from "react-pixi-fiber";
 import { useDispatch, useSelector } from "react-redux";
-import { selectRails } from "../../game/railwayYardSlice";
+import { selectRails, selectCursor } from "../../game/railwayYardSlice";
 import { selectTrain, selectEnemies, increseControlCounter } from "../../game/trainsSlice";
-import { generateRailwayYard, spawnTrain, moveTrains, accelerate, decelerate, restart } from "../../game/actions";
+import { restart, moveTrains, updateCursor, accelerate, decelerate, switchRail } from "../../game/actions";
 import { utils } from 'pixi.js';
 
 const Trainwreck = () => {
   const dispatch = useDispatch();
   const rails = useSelector(selectRails);
+  const cursor = useSelector(selectCursor);
   const train = useSelector(selectTrain);
   const enemyTrains = useSelector(selectEnemies);
   const [keyListeners, setKeyListeners] = useState();
@@ -41,14 +42,19 @@ const Trainwreck = () => {
   usePixiTicker((delta) => {
     // TODO, use delta for realtime physics
     dispatch(moveTrains());
+    dispatch(updateCursor());
 
     if(keyListeners && train) {
       if (!train.isCrashed) {
   			if(keyListeners.up.isDown) {
-  				// TODO this.switchCursor.switchCursor(0);
+          if(cursor.x !== undefined && cursor.y !== undefined) {
+    				dispatch(switchRail({x: cursor.x, y: cursor.y, value: 0}));
+          }
   			}
   			if(keyListeners.down.isDown) {
-  				// TODO this.switchCursor.switchCursor(1);
+          if(cursor.x !== undefined && cursor.y !== undefined) {
+    				dispatch(switchRail({x: cursor.x, y: cursor.y, value: 1}));
+          }
   			}
   			if(keyListeners.left.isDown) {
           dispatch(decelerate());
@@ -74,7 +80,7 @@ const Trainwreck = () => {
   return (
     <>
       {rails && (
-        <RailwayYard rails={rails} />
+        <RailwayYard rails={rails} cursor={cursor} />
       )}
       {train && (
         <Train train={train} />

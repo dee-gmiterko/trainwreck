@@ -4,6 +4,10 @@ export const railwayYardSlice = createSlice({
   name: 'railwayYard',
   initialState: {
     rails: [],
+    cursor: {
+      x: undefined,
+      y: undefined,
+    }
   },
   reducers: {
     setRails: (state, action) => {
@@ -12,6 +16,15 @@ export const railwayYardSlice = createSlice({
     removeEmptyCart: (state, action) => {
       const {x, y} = action.payload;
       state.rails[x][y].isCart = false;
+    },
+    setSwitch: (state, action) => {
+      const {x, y, side, value} = action.payload;
+      state.rails[x][y].switched[side] = value;
+    },
+    setCursor: (state, action) => {
+      const {x, y} = action.payload;
+      state.cursor.x = x;
+      state.cursor.y = y;
     }
   },
 })
@@ -19,15 +32,22 @@ export const railwayYardSlice = createSlice({
 export const {
   setRails,
   removeEmptyCart,
+  setSwitch,
+  setCursor,
 } = railwayYardSlice.actions;
 
 export const selectRails = (state) => state.railwayYard.rails;
+export const selectCursor = (state) => state.railwayYard.cursor;
 export const selectRailPiece = (state, x, y) => {
   const rails = selectRails(state);
   if(rails[x] && rails[x][y]) {
     return rails[x][y];
   }
   return null;
+}
+export const selectIsSwitchTo = (state, x, y) => {
+  const railPiece = selectRailPiece(state, x, y);
+  return railPiece && railPiece.to.length > 1;
 }
 export const selectTrackTo = (state, x, y) => {
   const railPiece = selectRailPiece(state, x, y);

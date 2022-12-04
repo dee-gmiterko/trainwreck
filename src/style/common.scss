@@ -15,7 +15,7 @@ body, html {
   > div {
     position: absolute;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
   }
 
   .v-top {
@@ -23,7 +23,7 @@ body, html {
   }
 
   .v-center {
-    align-items: center;
+    justify-content: center;
     height: 100%;
   }
 
@@ -36,7 +36,7 @@ body, html {
   }
 
   .h-center {
-    justify-content: center;
+    align-items: center;
     width: 100%;
   }
 
@@ -44,13 +44,18 @@ body, html {
     right: 0;
   }
 
-  .v-center.h-center {
-    flex-direction: column;
+  .stats {
+
+    .carts, .score {
+      font-size: 30pt;
+      color: #9FBC12;
+    }
   }
 
-  .carts, .score {
-    font-size: 32pt;
+  .speed {
+    font-size: 16pt;
     color: #9FBC12;
+    text-align: right;
   }
 
   .title {

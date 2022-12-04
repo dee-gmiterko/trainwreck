@@ -1,7 +1,7 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
 import WorldGenerator from "./WorldGenerator";
-import { setRails, selectIsEmptyCart, removeEmptyCart, selectPath } from "./railwayYardSlice";
-import { addTrain, selectTrains, selectTrain, selectScore, moveCart, addCart, setCarts, trainCrashed, adjustSpeed } from "./trainsSlice";
+import { setRails, selectIsEmptyCart, removeEmptyCart, selectPath, selectIsSwitchTo, selectCursor, setCursor, setSwitch } from "./railwayYardSlice";
+import { addTrain, selectTrains, selectTrain, selectScore, moveCart, addCart, setCarts, trainCrashed, adjustSpeed, selectTrainLocation, updatePath } from "./trainsSlice";
 // import { addScore } from ""
 import * as config from "../config";
 
@@ -233,6 +233,33 @@ const moveTrains = () => {
   }
 }
 
+const updateCursor = () => {
+  return function (dispatch, getState) {
+    const state = getState();
+    const train = selectTrain(state);
+    if(!train) {
+      return;
+    }
+    const cursor = selectCursor(state);
+    const {x: trainX} = selectTrainLocation(state);
+
+    var newCursorX = trainX + train.direction;
+    while(
+      newCursorX < train.path.length
+      && !selectIsSwitchTo(state, newCursorX, train.path[newCursorX])
+    ) {
+      newCursorX += train.direction;
+    }
+
+    if(cursor.x !== newCursorX || cursor.y !== train.path[newCursorX]) {
+      dispatch(setCursor({
+        x: newCursorX,
+        y: train.path[newCursorX],
+      }));
+    }
+  }
+}
+
 const accelerate = () => {
   return function (dispatch, getState) {
     const state = getState();
@@ -263,10 +290,39 @@ const decelerate = () => {
   }
 }
 
+const switchRail = ({x, y, value}) => {
+  return function (dispatch, getState) {
+    const state = getState();
+    const train = selectTrain(state);
+
+    dispatch(setSwitch({
+      x, y,
+      side: train.direction == config.RIGHT ? "to" : "from",
+      value: value,
+    }));
+
+    const newState = getState();
+    const trainX = Math.floor(train.carts[0].x / config.PIECE_WIDTH);
+    const trainY = train.path[trainX];
+    const path = selectPath(newState, trainX, trainY, train.direction);
+
+    const newPath = train.path.slice();
+    for(let i=trainX; i<path.length; i++) {
+      newPath[i] = path[i];
+    }
+    dispatch(updatePath({
+      train: 0,
+      path: newPath,
+    }));
+  }
+}
+
 export {
   restart,
   generateRailwayYard,
   moveTrains,
+  updateCursor,
   accelerate,
   decelerate,
+  switchRail,
 };

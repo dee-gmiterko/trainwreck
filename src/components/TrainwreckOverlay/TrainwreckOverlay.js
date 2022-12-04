@@ -1,19 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCartsCount, selectScore, selectCrashed, selectGuideVisibility } from "../../game/trainsSlice";
+import { selectCartsCount, selectScore, selectSpeed, selectCrashed, selectGuideVisibility } from "../../game/trainsSlice";
 import { utils } from 'pixi.js';
 
 const TrainwreckOverlay = () => {
   const carts = useSelector(selectCartsCount);
   const score = useSelector(selectScore);
+  const speed = useSelector(selectSpeed);
   const crashed = useSelector(selectCrashed);
   const guideVisibility = useSelector(selectGuideVisibility);
 
   return (
     <div className="overlay">
-      <div className="v-top h-right">
-        <span className="carts">{carts}</span>
-        <span className="score">{score}</span>
+      <div className="v-top h-right">,
+        <div className="stats">
+          <span className="carts"><i>[c]</i> {carts}</span>
+          <>&nbsp;</>
+          <span className="score"><i>[s]</i> {score} km</span>
+        </div>
+        <div>
+          <span className="speed">{Math.round(speed)} km/s</span>
+        </div>
       </div>
       {crashed && (
         <div className="v-center h-center">
