@@ -3,7 +3,7 @@ import Layout from "../components/Layout/Layout";
 import Game from "../components/Game/Game";
 import { graphql } from "gatsby";
 
-const IndexPage = ({ data: { site, cardImagesData } }) => {
+const IndexPage = ({ data: { site } }) => {
 
   return (
     <Layout siteMetadata={site.siteMetadata}>

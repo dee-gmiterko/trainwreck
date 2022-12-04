@@ -74,7 +74,7 @@ export const trainsSlice = createSlice({
       if (speed) {
         state.trains[train].speed = speed;
       }
-      if (hard) {
+      if (hard && speed) {
         state.trains[train].carts[0].rotation += Math.min(1, speed) * Math.PI / 4;
       }
       if (bounce) {

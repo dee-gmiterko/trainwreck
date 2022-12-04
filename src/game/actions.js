@@ -2,19 +2,13 @@ import { createSlice, createSelector } from '@reduxjs/toolkit';
 import WorldGenerator from "./WorldGenerator";
 import { setRails, selectIsEmptyCart, removeEmptyCart, selectPath, selectIsSwitchTo, selectCursor, setCursor, setSwitch } from "./railwayYardSlice";
 import { addTrain, selectTrains, selectTrain, selectScore, moveCart, addCart, setCarts, trainCrashed, adjustSpeed, selectTrainLocation, updatePath } from "./trainsSlice";
-// import { addScore } from ""
+import { addScore } from "./leaderboardSlice";
 import * as config from "../config";
 
 const restart = () => {
   return function (dispatch, getState) {
     const state = getState();
-    const score = selectScore(state);
-    if(score > 10) {
-      // dispatch(addScore({
-      //   score
-      // }));
-    }
-    dispatch(generateRailwayYard(60));
+    dispatch(generateRailwayYard(26));
     dispatch(respawnPlayerTrain({x: 0, y:0}));
   }
 }
@@ -152,6 +146,12 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
               hard: hard,
               bounce: !hard,
             }));
+            const score = selectScore(state);
+            if(score > 0) {
+              dispatch(addScore({
+                score,
+              }));
+            }
 
           } else {
             dispatch(setCarts({
@@ -185,6 +185,12 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
       dispatch(trainCrashed({
         train: trainIndex,
       }));
+      const score = selectScore(state);
+      if(score > 0) {
+        dispatch(addScore({
+          score,
+        }));
+      }
     }
 
     const newSpeed = train.speed * config.FRICTION_CRASHED_MOD;
@@ -194,12 +200,13 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
     }));
 
     //move locomotive
+    const newRotation = (locomotive.rotation||0) + Math.min(3, newSpeed) * (Math.random() - 0.5) * 0.2;
     dispatch(moveCart({
       train: trainIndex,
       cart: 0,
-      x: locomotive.x + newSpeed * Math.cos(locomotive.rotation),
-      y: locomotive.y + newSpeed * Math.sin(locomotive.rotation),
-      rotation: locomotive.rotation + Math.min(3, newSpeed) * (Math.random() - 0.5) * 0.2,
+      x: locomotive.x + newSpeed * Math.cos(newRotation),
+      y: locomotive.y + newSpeed * Math.sin(newRotation),
+      rotation: newRotation,
       skew: (locomotive.skew+config.CRASHED_TARGET_SKEW)/2,
     }));
 
