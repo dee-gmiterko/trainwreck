@@ -6,7 +6,7 @@ const render = (instance, path) => {
   instance.clear();
 
   instance.lineStyle(7, 0xE1303C, 0.5);
-  instance.moveTo(config.PIECE_WIDTH, config.PIECE_HEIGHT2);
+  instance.moveTo(0, config.PIECE_HEIGHT2);
   for (var i=0; i < path.length; i++) {
     instance.lineTo(config.PIECE_WIDTH * i + config.PIECE_WIDTH2, config.PIECE_HEIGHT * path[i] + config.PIECE_HEIGHT2);
   }

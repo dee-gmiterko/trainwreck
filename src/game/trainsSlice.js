@@ -81,6 +81,15 @@ export const trainsSlice = createSlice({
         state.trains[train].speed *= -1;
       }
     },
+    moveTrainToTransition: (state, action) => {
+      const {train} = action.payload;
+      const carts = state.trains[train].carts;
+      const newX = -20 * config.PIECE_WIDTH;
+      const newXs = carts.map(cart => newX+cart.x-carts[0].x);
+      for(let i=0; i<carts.length; i++) {
+        carts[i].x = newXs[i];
+      }
+    },
     adjustSpeed: (state, action) => {
       const {train, speed} = action.payload;
       state.trains[train].speed = speed;
@@ -99,6 +108,7 @@ export const {
   setCarts,
   moveCart,
   trainCrashed,
+  moveTrainToTransition,
   adjustSpeed,
   increseControlCounter,
 } = trainsSlice.actions;

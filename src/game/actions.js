@@ -1,35 +1,41 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
 import WorldGenerator from "./WorldGenerator";
-import { setRails, selectRails, selectIsEmptyCart, removeEmptyCart, selectPath, selectIsSwitchTo, selectCursor, setCursor, setSwitch } from "./railwayYardSlice";
-import { addTrain, selectTrains, selectTrain, selectScore, moveCart, addCart, setCarts, trainCrashed, adjustSpeed, selectTrainLocation, updatePath } from "./trainsSlice";
+import { selectLevel, newLevel, endLevel, selectTransition, decreaseTransition, selectRails, selectRailsWidth, selectIsEmptyCart, removeEmptyCart, selectPath, selectIsSwitchTo, selectCursor, setCursor, setSwitch } from "./railwayYardSlice";
+import { addTrain, selectTrains, selectTrain, selectScore, moveCart, addCart, setCarts, trainCrashed, adjustSpeed, selectTrainLocation, updatePath, moveTrainToTransition } from "./trainsSlice";
 import { addScore } from "./leaderboardSlice";
 import * as config from "../config";
 
 const restart = () => {
   return function (dispatch, getState) {
     const state = getState();
-    dispatch(generateRailwayYard(26));
-    dispatch(respawnPlayerTrain({x: 0, y:0}));
+    const level = selectLevel(state);
+    dispatch(generateRailwayYard(level+1));
+    dispatch(respawnPlayerTrain());
   }
 }
 
-const generateRailwayYard = (size) => {
+const generateRailwayYard = (level) => {
   return function (dispatch, getState) {
+    const size = 15 + level*3;
+    const levelMaxWidth = 4 + level*2;
     const worldGenerator = new WorldGenerator();
-    const rails = worldGenerator.generate(size);
-    dispatch(setRails({
-      rails
+    const rails = worldGenerator.generate(size, levelMaxWidth);
+    dispatch(newLevel({
+      rails,
+      level,
     }));
   }
 }
 
-const respawnPlayerTrain = ({x, y}) => {
+const respawnPlayerTrain = () => {
   return function (dispatch, getState) {
     const state = getState();
-    const path = selectPath(state, parseInt(x), parseInt(y), config.RIGHT);
+    const path = selectPath(state, 0, 0, config.RIGHT);
     dispatch(addTrain({
       clear: true,
-      x, y, path,
+      x: -10,
+      y: 0,
+      path,
     }));
   }
 }
@@ -40,7 +46,14 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
 
   var pieceX = Math.floor(locomotive.x / config.PIECE_WIDTH);
 
-  if(!train.isCrashed && train.path[pieceX] !== undefined) {
+  if(!train.isCrashed && pieceX >= selectRailsWidth(state) && trainIndex == 0) {
+    dispatch(moveTrainToTransition({
+      train: trainIndex,
+    }));
+    const level = selectLevel(state);
+    dispatch(generateRailwayYard(level+1));
+
+  } else if(!train.isCrashed && pieceX < 0 || train.path[pieceX] !== undefined) {
 
     let newSpeed = train.speed;
     if(train.speed > config.INITIAL_SPEED) {
@@ -172,7 +185,6 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
         }
       });
     });
-
   } else {
     if(!train.isCrashed) {
       dispatch(trainCrashed({

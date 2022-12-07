@@ -7,13 +7,14 @@ export default class WorldGenerator {
 		this.initGenarator();
 	}
 
-	generate(size) {
+	generate(size, levelMaxWidth) {
 		const rails = [];
 
 		rails[0] = {0: new RailPiece()};
-		for(var i=1; i<size-1; i++) {
+		rails[0][0].addFrom(0);
+		for(let i=1; i<size-1; i++) {
 
-			var psin = (x, f) => {
+			const psin = (x, f) => {
 				if(f === undefined) {
 					return Math.pow(Math.abs(Math.sin(x)), 2);
 				} else {
@@ -22,12 +23,17 @@ export default class WorldGenerator {
 				}
 			};
 
-			var width = 10 * psin(i / 321, 0.3) * Math.min(1, psin((i + 1) / 10) + psin((i - 64 ) / 41)) * psin(Math.sin(i/ 51) * 10, 0.5);
-			width = Math.min(9, (2 * Math.floor(width)) + 1);
+			const widthNoise = levelMaxWidth * psin(i / 321, 0.3) * Math.min(1, psin((i + 1) / 10) + psin((i - 64 ) / 41)) * psin(Math.sin(i/ 51) * 10, 0.5);
+			const maxWidth = Math.max(1, Math.min(levelMaxWidth, Math.min(i, size-i)));
+			const width = Math.min(maxWidth, (2 * Math.floor(widthNoise)) + 1);
 
-			this.generateColumn(rails, width);
+			this.generateColumn(rails, width, false);
 		}
-		rails[size-1] = {0: new RailPiece()};
+		//empty space after level
+		for(let i=0; i<40; i++) {
+			this.generateColumn(rails, 1, true);
+		}
+		rails[rails.length-1][0].addTo(0);
 
 		return rails.map(column => (
 			Object.fromEntries(Object.entries(column).map(([index, railPiece]) => (
@@ -36,36 +42,38 @@ export default class WorldGenerator {
 		));
 	}
 
-	generateColumn(rails, width) {
-		var half = Math.floor(width / 2);
+	generateColumn(rails, width, emptySpace) {
+		const half = Math.floor(width / 2);
 
-		var column = {};
-		for(var i=-half; i<=half; i++) {
+		const column = {};
+		for(let i=-half; i<=half; i++) {
 			column[i] = new RailPiece();
 		}
 		rails.push(column);
 
 		//rails
-		var columnBefore = rails[rails.length-2];
+		const columnBefore = rails[rails.length-2];
 		Object.keys(columnBefore).forEach(railIndex => {
 			railIndex = parseInt(railIndex, 10);
 
-			var usableGenerators = this.railGenerators.filter((railGenerator) => {
+			const usableGenerators = this.railGenerators.filter((railGenerator) => {
 				return railGenerator.canUse(columnBefore, column, railIndex);
 			})
 
 			if(usableGenerators.length > 0) {
-				var railGenerator = usableGenerators[Math.floor(Math.random() * usableGenerators.length)];
+				const railGenerator = usableGenerators[Math.floor(Math.random() * usableGenerators.length)];
 				railGenerator.use(columnBefore, column, railIndex);
 			}
 		});
 
 		// empty carts
-		for(let index in column) {
-			var railPiece = column[index];
+		if(!emptySpace) {
+			for(let index in column) {
+				const railPiece = column[index];
 
-			if(Math.random() < config.EMPTY_CART_PROBABILITY) {
-				railPiece.isCart = true;
+				if(Math.random() < config.EMPTY_CART_PROBABILITY) {
+					railPiece.isCart = true;
+				}
 			}
 		}
 	}
@@ -73,8 +81,8 @@ export default class WorldGenerator {
 	initGenarator() {
 		this.railGenerators = [];
 
-		var addRailType = (callback, rarity) => {
-			for(var i=0; i<rarity; i++) {
+		const addRailType = (callback, rarity) => {
+			for(let i=0; i<rarity; i++) {
 				this.railGenerators.push(callback);
 			}
 		}

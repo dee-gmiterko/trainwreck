@@ -7,11 +7,14 @@ export const railwayYardSlice = createSlice({
     cursor: {
       x: undefined,
       y: undefined,
-    }
+    },
+    level: 0
   },
   reducers: {
-    setRails: (state, action) => {
-      state.rails = action.payload.rails;
+    newLevel: (state, action) => {
+      const { rails, level } = action.payload;
+      state.rails = rails;
+      state.level = level;
     },
     removeEmptyCart: (state, action) => {
       const {x, y} = action.payload;
@@ -30,7 +33,7 @@ export const railwayYardSlice = createSlice({
 })
 
 export const {
-  setRails,
+  newLevel,
   removeEmptyCart,
   setSwitch,
   setCursor,
@@ -38,6 +41,9 @@ export const {
 
 export const selectRails = (state) => state.railwayYard.rails;
 export const selectCursor = (state) => state.railwayYard.cursor;
+export const selectTransition = (state) => state.railwayYard.transition;
+export const selectLevel = (state) => state.railwayYard.level;
+export const selectRailsWidth = (state) => selectRails(state).length - 35;
 export const selectRailPiece = (state, x, y) => {
   const rails = selectRails(state);
   if(rails[x] && rails[x][y]) {

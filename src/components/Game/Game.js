@@ -2,18 +2,22 @@ import React, { useState, useEffect, useRef } from "react";
 import Trainwreck from "../Trainwreck/Trainwreck";
 import TrainwreckOverlay from "../TrainwreckOverlay/TrainwreckOverlay";
 import Viewport from "../Viewport/Viewport";
-import { Stage } from "react-pixi-fiber";
-import { utils } from 'pixi.js';
 import store from "../../game/store";
 import { Provider } from "react-redux";
+import { Stage } from "react-pixi-fiber";
+import { selectGameSize, resize } from "../../game/gameSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { utils } from 'pixi.js';
 
 const Game = () => {
-  const [width, setWidth] = useState(window.innerWidth);
-  const [height, setHeight] = useState(window.innerHeight);
+  const dispatch = useDispatch();
+  const {width, height} = useSelector(selectGameSize);
 
   const resize = () => {
-    setWidth(window.innerWidth);
-    setHeight(window.innerHeight);
+    dispatch(resize({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    }));
   }
 
   useEffect(() => {
@@ -34,7 +38,7 @@ const Game = () => {
         resolution: 2,
       }}>
         <Provider store={store}>
-          <Viewport width={width} height={height}>
+          <Viewport>
             <Trainwreck />
           </Viewport>
         </Provider>
@@ -46,4 +50,14 @@ const Game = () => {
   );
 };
 
-export default Game;
+const GameWrapper = () => {
+
+  return (
+    <Provider store={store}>
+      <Game />
+      <TrainwreckOverlay />
+    </Provider>
+  );
+};
+
+export default GameWrapper;

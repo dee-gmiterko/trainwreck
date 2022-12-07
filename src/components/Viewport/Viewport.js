@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { CustomPIXIComponent, usePixiApp } from "react-pixi-fiber";
 import { Viewport } from 'pixi-viewport';
 import { useSelector } from "react-redux";
-import { selectTrain } from "../../game/trainsSlice";
-import * as config from "../../config";
+import { selectGameSize, selectCamera } from "../../game/gameSlice";
 
 const TYPE = "Viewport"
 const behavior = {
@@ -13,13 +12,6 @@ const behavior = {
         screenHeight: height,
         interaction: app.renderer.plugins.interaction
     });
-
-    viewport
-      .wheel()
-      .clampZoom({
-        minScale: 0.1,
-        maxScale: 5,
-      });
 
     return viewport;
   },
@@ -38,16 +30,10 @@ const behavior = {
 
 const CustomViewport = CustomPIXIComponent(behavior, TYPE);
 
-export default ({width, height, children}) => {
+export default ({ children }) => {
   const app = usePixiApp();
-  const train = useSelector(selectTrain);
-
-  let x, y, zoom;
-  if(train) {
-    zoom = 1 / (config.MIN_ZOOM + Math.atan(train.speed / 30) * config.MAX_ZOOM);
-    x = train.carts[0].x + config.CAMERA_CENTER_PERC * width / zoom;
-    y = train.carts[0].y;
-  }
+  const {width, height} = useSelector(selectGameSize);
+  const {x, y, zoom} = useSelector(selectCamera);
 
   return (
     <CustomViewport app={app} width={width} height={height} x={x} y={y} zoom={zoom}>
