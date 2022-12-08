@@ -30,9 +30,9 @@ const Trainwreck = () => {
     }
     setKeyListeners(keyListeners);
     return () => {
-      for(let keyListener of keyListeners) {
+      Object.values(keyListeners).forEach(keyListener => {
         keyListener.close();
-      }
+      })
     }
   }, [])
 
@@ -43,7 +43,7 @@ const Trainwreck = () => {
 
   usePixiTicker((delta) => {
     // TODO, use delta for realtime physics
-    dispatch(moveTrains());
+    dispatch(moveTrains(delta));
     dispatch(updateCursor());
     dispatch(spawnEnemies());
 

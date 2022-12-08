@@ -91,6 +91,24 @@ body, html {
     max-width: 1000px;
     margin: 0 16px 16px 16px;
   }
+
+  .animate-level {
+    animation: level 3s linear both;
+  }
+}
+
+@keyframes level {
+  0% {
+    opacity: 0;
+    animation-timing-function: ease-in-out;
+  }
+  10% {
+    opacity: 1;
+    animation-timing-function: ease-in-out;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 .leaderboard {

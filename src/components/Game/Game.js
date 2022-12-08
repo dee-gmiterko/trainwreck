@@ -13,7 +13,7 @@ const Game = () => {
   const dispatch = useDispatch();
   const {width, height} = useSelector(selectGameSize);
 
-  const resize = () => {
+  const onResize = () => {
     dispatch(resize({
       width: window.innerWidth,
       height: window.innerHeight,
@@ -21,9 +21,9 @@ const Game = () => {
   }
 
   useEffect(() => {
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', onResize);
     return () => {
-      window.removeEventListener('resize', resize);
+      window.removeEventListener('resize', onResize);
     }
   }, [])
 

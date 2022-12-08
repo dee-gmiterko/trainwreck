@@ -8,14 +8,14 @@ import * as config from "../config";
 const restart = () => {
   return function (dispatch, getState) {
     const state = getState();
-    const level = selectLevel(state);
-    dispatch(generateRailwayYard(level+1));
+    dispatch(generateRailwayYard(1));
     dispatch(respawnPlayerTrain());
   }
 }
 
 const generateRailwayYard = (level) => {
   return function (dispatch, getState) {
+    const state = getState();
     const size = 15 + level*3;
     const levelMaxWidth = 4 + level*2;
     const worldGenerator = new WorldGenerator();
@@ -24,6 +24,10 @@ const generateRailwayYard = (level) => {
       rails,
       level,
     }));
+    updatePath({
+      train: 0,
+      path: selectPath(state, 0, 0, config.RIGHT)
+    })
   }
 }
 
@@ -33,14 +37,14 @@ const respawnPlayerTrain = () => {
     const path = selectPath(state, 0, 0, config.RIGHT);
     dispatch(addTrain({
       clear: true,
-      x: -10,
+      x: -5,
       y: 0,
       path,
     }));
   }
 }
 
-const moveTrain = (dispatch, state, trains, trainIndex) => {
+const moveTrain = (dispatch, state, delta, trains, trainIndex, alreadyColided) => {
   const train = trains[trainIndex];
   const locomotive = train.carts[0];
 
@@ -52,6 +56,7 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
     }));
     const level = selectLevel(state);
     dispatch(generateRailwayYard(level+1));
+    return true;
 
   } else if(!train.isCrashed && pieceX < 0 || train.path[pieceX] !== undefined) {
 
@@ -87,16 +92,19 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
     }
 
     //move locomotive
+    const newCarts = train.carts.map(c => ({x: c.x, y: c.y}));
+    newCarts[0].x = locomotive.x + train.direction * newSpeed * delta;
+    newCarts[0].y = getY(newCarts[0].x);
     dispatch(moveCart({
       train: trainIndex,
       cart: 0,
-      x: locomotive.x + train.direction * newSpeed,
-      y: getY(locomotive.x),
-      rotation: getAngle(locomotive.x),
+      x: newCarts[0].x,
+      y: newCarts[0].y,
+      rotation: getAngle(newCarts[0].x),
     }));
 
     //check for cart on rail
-    var checkPieceX = Math.round(locomotive.x / config.PIECE_WIDTH);
+    var checkPieceX = Math.round(newCarts[0].x / config.PIECE_WIDTH);
     var checkPieceY = train.path[checkPieceX];
     const emptyCart = selectIsEmptyCart(state, checkPieceX, checkPieceY);
     if(emptyCart) {
@@ -105,24 +113,27 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
     }
 
     //move other carts
-    for(let i = 1; i < train.carts.length; i++) {
-      let dx = train.carts[i].x - train.carts[i-1].x;
-      let dy = train.carts[i].y - train.carts[i-1].y;
+    for(let i = 1; i < newCarts.length; i++) {
+      let dx = newCarts[i].x - newCarts[i-1].x;
+      let dy = newCarts[i].y - newCarts[i-1].y;
       let l = config.CART_DELAY / Math.sqrt(dx * dx + dy * dy);
       dx *= l;
       dy *= l;
 
-      var skew = train.carts[i].y - getY(train.carts[i].x);
+      var skew = train.carts[i].y - getY(newCarts[i].x);
       if(Math.abs(skew) > config.CART_MAX_SKEW) {
         skew = Math.sign(skew) * config.CART_MAX_SKEW;
       }
 
+      newCarts[i].x = newCarts[i-1].x + dx;
+      newCarts[i].y = newCarts[i-1].y + dy;
+
       dispatch(moveCart({
         train: trainIndex,
         cart: i,
-        x: train.carts[i-1].x + dx,
-        y: train.carts[i-1].y + dy,
-        rotation: getAngle(train.carts[i].x),
+        x: newCarts[i].x,
+        y: newCarts[i].y,
+        rotation: getAngle(newCarts[i].x),
         skew: skew,
       }))
     }
@@ -143,10 +154,15 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
         var dy = otherCart.y - locomotive.y;
         if(Math.sqrt(dx*dx+dy*dy) < (train.isEnemy ? config.TRAIN_CRASH_DISTANCE * 0.81 : config.TRAIN_CRASH_DISTANCE)) {
 
-          let meCarts = train.carts.length - train.carts.length;
+          let meCarts = train.carts.length - otherTrain.carts.length;
           let itCarts = otherTrain.carts.length - train.carts.length;
 
           let hard = (meCarts < 1 && itCarts >= 1) || (meCarts >= 1 && itCarts < 1);
+
+          if(alreadyColided.includes(`${otherIndex}:${trainIndex}`)) {
+            console.log("alreadyColided", otherIndex, trainIndex, alreadyColided)
+            return;
+          }
 
           if(meCarts < 1) {
             dispatch(setCarts({
@@ -182,6 +198,8 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
             speed: Math.max(train.speed, otherTrain.speed),
             bounce: true,
           }));
+
+          alreadyColided.push(`${trainIndex}:${otherIndex}`);
         }
       });
     });
@@ -205,29 +223,35 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
     }));
 
     //move locomotive
-    const newRotation = (locomotive.rotation||0) + Math.min(3, newSpeed) * (Math.random() - 0.5) * 0.2;
+    const newCarts = train.carts.map(c => ({x: c.x, y: c.y}));
+    const newRotation = (locomotive.rotation||0) + Math.min(3, newSpeed) * (Math.random() - 0.5) * 0.2 * delta;
+    newCarts[0].x = locomotive.x + newSpeed * Math.cos(newRotation) * delta;
+    newCarts[0].y = locomotive.y + newSpeed * Math.sin(newRotation) * delta;
     dispatch(moveCart({
       train: trainIndex,
       cart: 0,
-      x: locomotive.x + newSpeed * Math.cos(newRotation),
-      y: locomotive.y + newSpeed * Math.sin(newRotation),
+      x: newCarts[0].x,
+      y: newCarts[0].y,
       rotation: newRotation,
       skew: (locomotive.skew+config.CRASHED_TARGET_SKEW)/2,
     }));
 
     //move other carts
-    for(let i = 1; i < train.carts.length; i++) {
-      let dx = train.carts[i].x - train.carts[i-1].x;
-      let dy = train.carts[i].y - train.carts[i-1].y;
+    for(let i = 1; i < newCarts.length; i++) {
+      let dx = newCarts[i].x - newCarts[i-1].x;
+      let dy = newCarts[i].y - newCarts[i-1].y;
       let l = config.CART_DELAY / Math.sqrt(dx * dx + dy * dy);
       dx *= l;
       dy *= l;
 
+      newCarts[i].x = newCarts[i-1].x + dx;
+      newCarts[i].y = newCarts[i-1].y + dy;
+
       dispatch(moveCart({
         train: trainIndex,
         cart: i,
-        x: train.carts[i-1].x + dx,
-        y: train.carts[i-1].y + dy,
+        x: newCarts[i].x,
+        y: newCarts[i].y,
         rotation: Math.min(Math.max(Math.atan(dy / dx), -1), 1),
         skew: (train.carts[i].skew+config.CRASHED_TARGET_SKEW)/2,
       }));
@@ -235,12 +259,16 @@ const moveTrain = (dispatch, state, trains, trainIndex) => {
   }
 }
 
-const moveTrains = () => {
+const moveTrains = (delta) => {
   return function (dispatch, getState) {
     const state = getState();
     const trains = selectTrains(state);
+    const alreadyColided = [];
     for (let trainIndex in trains) {
-      moveTrain(dispatch, state, trains, trainIndex)
+      const levelFinished = moveTrain(dispatch, state, delta, trains, trainIndex, alreadyColided);
+      if (levelFinished) {
+        break;
+      }
     }
   }
 }
