@@ -1,0 +1,13 @@
+/*!
+ * pixi-viewport - v4.38.0
+ * Compiled Sun, 27 Nov 2022 13:43:58 UTC
+ *
+ * pixi-viewport is licensed under the MIT License.
+ * http://www.opensource.org/licenses/mit-license
+ * 
+ * Copyright 2019-2020, David Figatner, All Rights Reserved
+ */
+
+/*! https://mths.be/punycode v1.3.2 by @mathias */
+
+/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
