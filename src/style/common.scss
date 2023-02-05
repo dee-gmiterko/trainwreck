@@ -6,6 +6,30 @@ body, html {
   font-family: sans-serif;
 }
 
+.header-titles {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-end;
+  margin-bottom: 32pt;
+
+  h2 {
+    font-size: 50pt;
+    color: #247192;
+    margin: 0;
+  }
+
+  h3 {
+    font-size: 32pt;
+    color: #9FBC12;
+    margin: 0;
+
+    span {
+      color: #ccc;
+    }
+  }
+}
+
 .overlay {
   position: fixed;
   top: 16px; right: 16px; bottom: 16px; left: 16px;
@@ -54,6 +78,11 @@ body, html {
       font-style: normal;
       margin-right: 10px;
       margin-left: 20px;
+
+      img {
+        width: 1em;
+        height: 1em;
+      }
     }
 
     .carts, .score {
@@ -156,5 +185,5 @@ body, html {
 .leaderboard-page {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 100px;
+  padding: 80px 100px;
 }

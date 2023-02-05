@@ -1,3 +1,14 @@
+export const fakeWindow = () => {
+  if (typeof window === "undefined") {
+   global.window = {
+     innerWidth: 1920,
+     innerHeight: 900,
+     requestAnimationFrame: () => {},
+     cancelAnimationFrame: () => {},
+   }
+  }
+}
+
 const letters = ['s', 'r', 'n', 'i', 'd', 'l', 't', 'c', 'm'];
 const vowels = ['e', 'a', 'o', 'u'];
 export const randomName = () => {

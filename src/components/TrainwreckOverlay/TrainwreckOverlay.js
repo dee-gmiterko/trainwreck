@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import Leaderboard from "../Leaderboard/Leaderboard";
 import { navigate } from "gatsby";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectLevel } from "../../game/railwayYardSlice";
 import { selectCartsCount, selectScore, selectSpeed, selectCrashed, selectGuideVisibility } from "../../game/trainsSlice";
-import { utils } from 'pixi.js';
+
+import imgCart from "../../images/1f683.svg";
+import imgCoint from "../../images/1fa99.svg";
 
 const TrainwreckOverlay = () => {
   const level = useSelector(selectLevel);
@@ -18,9 +20,13 @@ const TrainwreckOverlay = () => {
     <div className="overlay">
       <div className="v-top h-right">
         <div className="stats">
-          <i>🚃</i>
+          <i>
+            <img src={imgCart} alt="Carts" />
+          </i>
           <span className="carts">{carts}</span>
-          <i>🪙</i>
+          <i>
+            <img src={imgCoint} alt="Score" />
+          </i>
           <span className="score">{score}</span>
         </div>
         <div className="stats">

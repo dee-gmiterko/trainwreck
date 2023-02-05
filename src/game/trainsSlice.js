@@ -1,4 +1,4 @@
-import { createSlice, createSelector } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import * as config from "../config";
 
 export const trainsSlice = createSlice({
@@ -10,7 +10,7 @@ export const trainsSlice = createSlice({
   },
   reducers: {
     addTrain: (state, action) => {
-      const { clear, direction, speed, isEnemy, x, y, path } = action.payload;
+      const { clear, direction, speed, isEnemy, x, y, carts, path } = action.payload;
       if(clear) {
         state.trains = [];
         state.score = 0;
@@ -20,13 +20,21 @@ export const trainsSlice = createSlice({
         speed: speed || config.INITIAL_SPEED,
         isCrashed: false,
         isEnemy: isEnemy || false,
-        carts: [
-          {
-            x: (x || 0) * config.PIECE_WIDTH + config.PIECE_WIDTH2 * (direction || config.RIGHT),
-        		y: (y || 0) * config.PIECE_HEIGHT,
-            rotation: 0,
-          }
-        ],
+        carts: (new Array(carts || 1)).fill(null).map((_, i) =>
+          i === 0 ? (
+            {
+              x: (x || 0) * config.PIECE_WIDTH + config.PIECE_WIDTH2 * (direction || config.RIGHT),
+              y: (y || 0) * config.PIECE_HEIGHT,
+              rotation: 0,
+            }
+          ) : (
+            {
+              x: -999999 * direction,
+              y: 0,
+              rotation: 0,
+            }
+          )
+        ),
         path: path,
       })
     },
@@ -42,7 +50,7 @@ export const trainsSlice = createSlice({
         y: 0,
         rotation: 0,
       })
-      if(train == 0) {
+      if(train === 0) {
         state.score++;
       }
     },
@@ -89,7 +97,7 @@ export const trainsSlice = createSlice({
     moveTrainToTransition: (state, action) => {
       const {train} = action.payload;
       const carts = state.trains[train].carts;
-      const newX = -20 * config.PIECE_WIDTH;
+      const newX = -config.TRANSITION_LENGTH;
       const newXs = carts.map(cart => newX+cart.x-carts[0].x);
       for(let i=0; i<carts.length; i++) {
         carts[i].x = newXs[i];

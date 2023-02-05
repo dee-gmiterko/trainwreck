@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import { selectLeaderboard } from "../../game/leaderboardSlice";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { selectLeaderboard, initLeaderboard } from "../../game/leaderboardSlice";
 
 const Leaderboard = ({ size, score }) => {
+  const dispatch = useDispatch();
   const leaderboard = useSelector(state => selectLeaderboard(state, size || 10, score));
+
+  useEffect(() => {
+    dispatch(initLeaderboard());
+  }, [dispatch])
 
   return (
     <table className="leaderboard">

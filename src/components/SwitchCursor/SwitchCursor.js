@@ -1,6 +1,4 @@
 import { CustomPIXIComponent } from "react-pixi-fiber";
-import railEasingIn from 'eases/sine-in';
-import railEasingOut from 'eases/sine-out';
 import * as PIXI from 'pixi.js';
 import * as config from"../../config";
 

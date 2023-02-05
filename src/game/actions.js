@@ -1,13 +1,12 @@
-import { createSlice, createSelector } from '@reduxjs/toolkit';
 import WorldGenerator from "./WorldGenerator";
-import { selectLevel, newLevel, endLevel, selectTransition, decreaseTransition, selectRails, selectRailsWidth, selectIsEmptyCart, removeEmptyCart, selectPath, selectIsSwitchTo, selectCursor, setCursor, setSwitch } from "./railwayYardSlice";
+import { selectCameraBox } from "./gameSlice";
+import { selectLevel, newLevel, selectRails, selectRailsWidth, selectIsEmptyCart, removeEmptyCart, selectPath, selectIsSwitchTo, selectCursor, setCursor, setSwitch } from "./railwayYardSlice";
 import { addTrain, selectTrains, selectTrain, selectScore, moveCart, addCart, setCarts, trainCrashed, adjustSpeed, selectTrainLocation, updatePath, moveTrainToTransition } from "./trainsSlice";
 import { addScore } from "./leaderboardSlice";
 import * as config from "../config";
 
 const restart = () => {
-  return function (dispatch, getState) {
-    const state = getState();
+  return function (dispatch) {
     dispatch(generateRailwayYard(1));
     dispatch(respawnPlayerTrain());
   }
@@ -15,18 +14,20 @@ const restart = () => {
 
 const generateRailwayYard = (level) => {
   return function (dispatch, getState) {
-    const state = getState();
-    const size = 15 + level*3;
-    const levelMaxWidth = 4 + level*2;
+    const size = config.LEVEL_SIZE + level * config.LEVEL_SIZE_INCREASE;
+    const levelMaxWidth = config.LEVEL_WIDTH + level * config.LEVEL_WIDTH_INCREASE;
     const worldGenerator = new WorldGenerator();
     const rails = worldGenerator.generate(size, levelMaxWidth);
     dispatch(newLevel({
       rails,
       level,
     }));
-    updatePath({
-      train: 0,
-      path: selectPath(state, 0, 0, config.RIGHT)
+    setTimeout(() => {
+      dispatch(spawnEnemies(level));
+      dispatch(updatePath({
+        train: 0,
+        path: selectPath(getState(), 0, 0, config.RIGHT)
+      }));
     })
   }
 }
@@ -50,7 +51,7 @@ const moveTrain = (dispatch, state, delta, trains, trainIndex, alreadyColided) =
 
   var pieceX = Math.floor(locomotive.x / config.PIECE_WIDTH);
 
-  if(!train.isCrashed && pieceX >= selectRailsWidth(state) && trainIndex == 0) {
+  if(!train.isCrashed && pieceX >= selectRailsWidth(state) && trainIndex === 0) {
     dispatch(moveTrainToTransition({
       train: trainIndex,
     }));
@@ -58,7 +59,7 @@ const moveTrain = (dispatch, state, delta, trains, trainIndex, alreadyColided) =
     dispatch(generateRailwayYard(level+1));
     return true;
 
-  } else if(!train.isCrashed && pieceX < 0 || train.path[pieceX] !== undefined) {
+  } else if(!train.isCrashed && (pieceX < 0 || train.path[pieceX] !== undefined)) {
 
     let newSpeed = train.speed;
     if(train.speed > config.INITIAL_SPEED) {
@@ -139,17 +140,20 @@ const moveTrain = (dispatch, state, delta, trains, trainIndex, alreadyColided) =
     }
 
     //test other train collision
-    trains.forEach((otherTrain, otherIndex) => {
+    for (let otherIndex = 0; otherIndex < trains.length; otherIndex++) {
+      const otherTrain = trains[otherIndex];
       if(otherIndex === trainIndex) {
-        return;
+        continue;
       }
       if(otherTrain.isCrashed) {
-        return;
+        continue;
       }
-      if(otherTrain.isEnemy === train.isEnemy) {
-        return;
+      if(alreadyColided.includes(otherIndex) || alreadyColided.includes(trainIndex)) {
+        continue;
       }
-      otherTrain.carts.forEach(otherCart => {
+      for (let otherCartIndex = 0; otherCartIndex < otherTrain.carts.length; otherCartIndex++) {
+        const otherCart = otherTrain.carts[otherCartIndex];
+
         var dx = otherCart.x - locomotive.x;
         var dy = otherCart.y - locomotive.y;
         if(Math.sqrt(dx*dx+dy*dy) < (train.isEnemy ? config.TRAIN_CRASH_DISTANCE * 0.81 : config.TRAIN_CRASH_DISTANCE)) {
@@ -159,50 +163,69 @@ const moveTrain = (dispatch, state, delta, trains, trainIndex, alreadyColided) =
 
           let hard = (meCarts < 1 && itCarts >= 1) || (meCarts >= 1 && itCarts < 1);
 
-          if(alreadyColided.includes(`${otherIndex}:${trainIndex}`)) {
-            console.log("alreadyColided", otherIndex, trainIndex, alreadyColided)
-            return;
-          }
-
+          dispatch(setCarts({
+            train: trainIndex,
+            carts: Math.max(1, meCarts),
+          }));
           if(meCarts < 1) {
-            dispatch(setCarts({
-              train: trainIndex,
-              carts: 1,
-            }));
-            dispatch(trainCrashed({
-              train: trainIndex,
-              speed: Math.max(train.speed, otherTrain.speed),
-              hard: hard,
-              bounce: !hard,
-            }));
-            const score = selectScore(state);
-            if(score > 0) {
-              dispatch(addScore({
-                score,
+            if(trainIndex === 0) {
+              dispatch(trainCrashed({
+                train: trainIndex,
+                speed: Math.max(train.speed, otherTrain.speed),
+                hard: hard,
+                bounce: !hard,
               }));
+              const score = selectScore(state);
+              if(score > 0) {
+                dispatch(addScore({
+                  score,
+                }));
+              }
+              break;
+            } else {
+              dispatch(trainCrashed({
+                train: trainIndex,
+                speed: Math.max(train.speed, otherTrain.speed),
+                bounce: true,
+              }));
+              break;
             }
-
-          } else {
-            dispatch(setCarts({
-              train: trainIndex,
-              carts: meCarts,
-            }))
           }
 
           dispatch(setCarts({
             train: otherIndex,
             carts: Math.max(1, itCarts),
           }));
-          dispatch(trainCrashed({
-            train: otherIndex,
-            speed: Math.max(train.speed, otherTrain.speed),
-            bounce: true,
-          }));
+          if(itCarts < 1) {
+            if(otherIndex === 0) {
+              dispatch(trainCrashed({
+                train: otherIndex,
+                speed: Math.max(train.speed, otherTrain.speed),
+                hard: hard,
+                bounce: !hard,
+              }));
+              const score = selectScore(state);
+              if(score > 0) {
+                dispatch(addScore({
+                  score,
+                }));
+              }
+              break;
+            } else {
+              dispatch(trainCrashed({
+                train: otherIndex,
+                speed: Math.max(train.speed, otherTrain.speed),
+                bounce: true,
+              }));
+              break;
+            }
+          }
 
-          alreadyColided.push(`${trainIndex}:${otherIndex}`);
+          alreadyColided.push(trainIndex)
+          alreadyColided.push(otherIndex);
         }
-      });
-    });
+      }
+    }
   } else {
     if(!train.isCrashed) {
       dispatch(trainCrashed({
@@ -263,11 +286,15 @@ const moveTrains = (delta) => {
   return function (dispatch, getState) {
     const state = getState();
     const trains = selectTrains(state);
+    const cameraBox = selectCameraBox(state);
     const alreadyColided = [];
-    for (let trainIndex in trains) {
-      const levelFinished = moveTrain(dispatch, state, delta, trains, trainIndex, alreadyColided);
-      if (levelFinished) {
-        break;
+    for (let trainIndex = 0; trainIndex < trains.length; trainIndex++) {
+      const trainX = trains[trainIndex].carts[0].x;
+      if(trainIndex === 0 || (trainX >= cameraBox.x && trainX < cameraBox.x+cameraBox.width)) {
+        const levelFinished = moveTrain(dispatch, state, delta, trains, trainIndex, alreadyColided);
+        if (levelFinished) {
+          break;
+        }
       }
     }
   }
@@ -300,27 +327,30 @@ const updateCursor = () => {
   }
 }
 
-const spawnEnemies = () => {
+const spawnEnemies = (level) => {
   return function (dispatch, getState) {
     const state = getState();
-    const train = selectTrain(state);
     const rails = selectRails(state);
-
-    if(Math.random() < config.ENEMY_SPAWN_RATE * train.speed) {
-      const x = Math.floor((
-        train.carts[0].x + 800 /* TODO dynamic spawn distance */
-      ) / config.PIECE_WIDTH);
-
-      if(rails[x]) {
-        const ys = Object.keys(rails[x]);
-        const y = parseInt(ys[Math.floor(Math.random()*ys.length)], 10);
-
-        const path = selectPath(state, x, y, config.LEFT);
-        dispatch(addTrain({
-          x, y, path,
-          direction: config.LEFT,
-          isEnemy: true,
-        }));
+    const rate = config.ENEMY_SPAWN_RATE + level * config.ENEMY_SPAWN_RATE_INCREASE;
+    for (let xstr in rails) {
+      const x = parseInt(xstr);
+      if (Object.keys(rails[xstr]).length > 1) {
+        for (let ystr in rails[xstr]) {
+          const y = parseInt(ystr);
+          if(Math.random() < rate) {
+            const path = selectPath(state, x, y, config.LEFT);
+            let carts = 0;
+            while (carts < 5 && Math.random() < config.ENEMY_SPAWN_CARTS_PROB) {
+              carts++;
+            }
+            dispatch(addTrain({
+              x, y, path,
+              direction: config.LEFT,
+              isEnemy: true,
+              carts,
+            }));
+          }
+        }
       }
     }
   }
@@ -363,12 +393,12 @@ const switchRail = ({x, y, value}) => {
 
     dispatch(setSwitch({
       x, y,
-      side: train.direction == config.RIGHT ? "to" : "from",
+      side: train.direction === config.RIGHT ? "to" : "from",
       value: value,
     }));
 
     const newState = getState();
-    const trainX = Math.floor(train.carts[0].x / config.PIECE_WIDTH);
+    const trainX = Math.max(0, Math.floor(train.carts[0].x / config.PIECE_WIDTH));
     const trainY = train.path[trainX];
     const path = selectPath(newState, trainX, trainY, train.direction);
 

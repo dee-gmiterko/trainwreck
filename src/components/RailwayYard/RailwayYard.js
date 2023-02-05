@@ -21,7 +21,7 @@ const RailwayYard = ({ rails, switchCursor, switchPath }) => {
         <SwitchCursor x={switchCursor.x} y={switchCursor.y} />
       )}
       {switchPath && (
-        <SwitchPath path={switchPath} />
+        <SwitchPath path={switchPath} rails={rails} />
       )}
     </Container>
   );

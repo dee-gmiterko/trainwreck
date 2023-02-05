@@ -1,14 +1,18 @@
 import React from "react";
 import { ToastContainer } from "react-toastify";
+import SiteMetadata from "../SiteMetadata/SiteMetadata";
 
 const Layout = ({ title, siteMetadata, children }) => {
   return (
-    <div className="page-root">
+    <>
+      <SiteMetadata siteMetadata={siteMetadata} title={title} />
+      <div className="page-root">
+        
+        {children}
 
-      {children}
-
-      <ToastContainer theme="dark" />
-    </div>
+        <ToastContainer theme="dark" />
+      </div>
+    </>
   );
 };
 

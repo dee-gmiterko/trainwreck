@@ -1,7 +1,9 @@
-import { createSlice, createSelector } from '@reduxjs/toolkit';
-import { randomName } from "../utils";
+import { createSlice } from '@reduxjs/toolkit';
+import { fakeWindow } from "../utils";
 import { selectTrain } from "./trainsSlice";
 import * as config from "../config";
+
+fakeWindow();
 
 export const gameSlice = createSlice({
   name: 'game',
@@ -45,6 +47,18 @@ export const selectCamera = (state) => {
   }
 
   return {x, y, zoom, transitionLocked};
+}
+export const selectCameraBox = (state) => {
+  const { width, height } = selectGameSize(state);
+  const { x, y, zoom } = selectCamera(state);
+  const boxWidth = width/zoom;
+  const boxHeight = height/zoom;
+  return {
+    x: x-boxWidth/2,
+    y: y-height/2,
+    width: boxWidth,
+    height: boxHeight,
+  }
 }
 
 

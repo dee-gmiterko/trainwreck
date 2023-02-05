@@ -1,4 +1,4 @@
-import { createSlice, createSelector } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { randomName } from "../utils";
 
 export const leaderboardSlice = createSlice({
@@ -18,7 +18,10 @@ export const leaderboardSlice = createSlice({
         b.score - a.score
       ));
     },
-    fillLeaderboard: (state, action) => {
+    initLeaderboard: (state, action) => {
+      if(state.attempts.length > 3) {
+        return;
+      }
       const r6 = (pow) => (
         Math.pow(
           (Math.random()+Math.random()+Math.random()+Math.random()+Math.random()+Math.random())/6,
@@ -26,19 +29,19 @@ export const leaderboardSlice = createSlice({
         )
       )
       // high
-      for(let i=0; i<150; i++) {
+      for(let i=0; i<120; i++) {
         state.attempts.push({
           score: Math.floor(
-            r6(5) * 4096 + r6(4) * 1024 + r6(3) * 256 + r6(2) * 64 + r6(1) * 16 + r6(2) * 4 + r6(1)
+            r6(6) * 1024 + r6(4) * 256 + r6(2) * 64 + r6(1) * 16 + r6(2) * 4 + r6(1)
           ),
           user: randomName(),
         });
       }
       // low
-      for(let i=0; i<100; i++) {
+      for(let i=0; i<80; i++) {
         state.attempts.push({
           score: Math.floor(
-            r6(4) * 64 + r6(3) * 16 + r6(2) * 4 + r6(1) * 1
+            r6(3) * 16 + r6(2) * 4 + r6(1) * 1
           ),
           user: randomName(),
         });
@@ -47,7 +50,7 @@ export const leaderboardSlice = createSlice({
         if (b.score !== a.score) {
           return b.score - a.score;
         } else {
-          return (b.user == state.user) - (a.user == state.user);
+          return (b.user === state.user) - (a.user === state.user);
         }
       });
     }
@@ -56,7 +59,7 @@ export const leaderboardSlice = createSlice({
 
 export const {
   addScore,
-  fillLeaderboard,
+  initLeaderboard,
 } = leaderboardSlice.actions;
 
 export const selectAttempts = (state) => state.leaderboard.attempts;

@@ -33,7 +33,7 @@ export const SPEED_CHANGE_DROP_PER_CART = 0.74;
 export const FRICTION = 0.003;
 export const FRICTION_CRASHED_MOD = 0.92;
 export const CRASHED_TARGET_SKEW = 0.4;
-export const MIN_SPEED = -1;
+export const MIN_SPEED = -0.5;
 export const MAX_SPEED = undefined;
 export const TRAIN_CRASH_DISTANCE = CART_WIDTH / 3;
 
@@ -41,10 +41,18 @@ export const ENEMY_COLOR = '#247192';
 export const PLAYER_COLOR = '#9FBC12';
 
 export const SCORE_SPEED = 3;
-export const ENEMY_SPAWN_RATE = 0.003;
-export const ENEMY_SPAWN_CARTS_PROB = 0.2;
+export const ENEMY_SPAWN_RATE = 0.04;
+export const ENEMY_SPAWN_RATE_INCREASE = 0.005;
+export const ENEMY_SPAWN_CARTS_PROB = 0.4;
 export const ALLOW_MIDGAME_RESTART = true;
+export const LEVEL_SIZE = 15;
+export const LEVEL_SIZE_INCREASE = 4;
+export const LEVEL_WIDTH = 8;
+export const LEVEL_WIDTH_INCREASE = 0.8;
 
 export const CURSOR_SIZE = 15;
 export const CURSOR_WIDTH = 2;
 export const CURSOR_COLOR = 0x9FBC12;
+
+export const TRANSITION_AMPLITUDE = 5 * PIECE_HEIGHT;
+export const TRANSITION_LENGTH = 25 * PIECE_WIDTH;

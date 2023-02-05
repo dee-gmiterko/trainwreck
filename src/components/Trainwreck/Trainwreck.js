@@ -1,16 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import * as config from "../../config";
 import RailwayYard from "../RailwayYard/RailwayYard";
 import Train from "../Train/Train";
-import Viewport from "../Viewport/Viewport";
 import KeyListener from "../../game/KeyListener";
 import { usePixiTicker } from "react-pixi-fiber";
 import { useDispatch, useSelector } from "react-redux";
 import { selectRails, selectCursor } from "../../game/railwayYardSlice";
 import { selectTrain, selectEnemies, increseControlCounter } from "../../game/trainsSlice";
-import { restart, moveTrains, updateCursor, accelerate, decelerate, switchRail, spawnEnemies } from "../../game/actions";
-import { fillLeaderboard } from "../../game/leaderboardSlice";
-import { utils } from 'pixi.js';
+import { restart, moveTrains, updateCursor, accelerate, decelerate, switchRail } from "../../game/actions";
+import { initLeaderboard } from "../../game/leaderboardSlice";
 
 const Trainwreck = () => {
   const dispatch = useDispatch();
@@ -38,14 +36,13 @@ const Trainwreck = () => {
 
   useEffect(() => {
     dispatch(restart());
-    dispatch(fillLeaderboard());
-  }, [])
+    dispatch(initLeaderboard());
+  }, [dispatch])
 
   usePixiTicker((delta) => {
     // TODO, use delta for realtime physics
     dispatch(moveTrains(delta));
     dispatch(updateCursor());
-    dispatch(spawnEnemies());
 
     if(keyListeners && train) {
       if (!train.isCrashed) {

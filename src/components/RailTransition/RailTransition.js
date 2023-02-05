@@ -54,8 +54,14 @@ const render = (instance, width, trainX, zoom, transitionLocked) => {
   } else {
     instance.x = 0;
   }
-  displayRailPieceSegment(-drawWidth, config.PIECE_HEIGHT2, -drawWidth2, config.PIECE_HEIGHT2, subpieces, railEasingIn);
-  displayRailPieceSegment(-drawWidth2, config.PIECE_HEIGHT2, 0+subpieceWidth, config.PIECE_HEIGHT2, subpieces+1, railEasingOut);
+  const curve = (
+    Math.sin(trainX/100) *
+    config.TRANSITION_AMPLITUDE *
+    Math.atan(Math.min(0, (trainX+drawWidth)/300)) / (Math.PI/2) *
+    Math.atan(Math.max(0, (trainX+config.TRANSITION_LENGTH)/300)) / (Math.PI/2)
+  );
+  displayRailPieceSegment(-drawWidth, config.PIECE_HEIGHT2, -drawWidth2, config.PIECE_HEIGHT2, subpieces, railEasingOut);
+  displayRailPieceSegment(-drawWidth2, config.PIECE_HEIGHT2, 0+subpieceWidth, config.PIECE_HEIGHT2+curve, subpieces+1, railEasingIn);
 }
 
 const TYPE = "RailTransition";
@@ -74,7 +80,7 @@ export const behavior = {
 
 const RailTransition = CustomPIXIComponent(behavior, TYPE);
 
-export default () => {
+const RailTransitionWrapper = () => {
   const train = useSelector(selectTrain);
   const {width} = useSelector(selectGameSize);
   const {zoom, transitionLocked} = useSelector(selectCamera);
@@ -85,3 +91,5 @@ export default () => {
     <RailTransition width={width} trainX={trainX} zoom={zoom} transitionLocked={transitionLocked} />
   )
 }
+
+export default RailTransitionWrapper;

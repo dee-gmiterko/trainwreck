@@ -12,7 +12,8 @@
     "format": "prettier --write \"**/*.{js,jsx,json,md}\"",
     "start": "npm run develop",
     "serve": "gatsby serve",
-    "clean": "gatsby clean"
+    "clean": "gatsby clean",
+    "deploy": "yarn run build --prefix-paths && gh-pages -d public"
   },
   "keywords": [
     "javascript",
@@ -33,6 +34,7 @@
     "gatsby-plugin-offline": "^5.24.0",
     "gatsby-plugin-postcss": "^5.24.0",
     "gatsby-plugin-sass": "^5.24.0",
+    "gh-pages": "^4.0.0",
     "pixi-viewport": "^4.38.0",
     "pixi.js": "^7.0.4",
     "postcss": "^8.4.17",

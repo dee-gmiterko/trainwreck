@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { CustomPIXIComponent, usePixiApp } from "react-pixi-fiber";
 import { Viewport } from 'pixi-viewport';
 import { useSelector } from "react-redux";
@@ -30,7 +30,7 @@ const behavior = {
 
 const CustomViewport = CustomPIXIComponent(behavior, TYPE);
 
-export default ({ children }) => {
+const CustomViewportWrapper = ({ children }) => {
   const app = usePixiApp();
   const {width, height} = useSelector(selectGameSize);
   const {x, y, zoom} = useSelector(selectCamera);
@@ -41,3 +41,5 @@ export default ({ children }) => {
     </CustomViewport>
   );
 };
+
+export default CustomViewportWrapper;

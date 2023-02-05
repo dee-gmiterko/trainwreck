@@ -1,8 +1,8 @@
 const dotenv = require("dotenv");
-const path = require("path");
 dotenv.config();
 
 module.exports = {
+  pathPrefix: "/trainwreck",
   siteMetadata: {
     title: `Trainwreck`,
     description: `Simple pixi.js game`,
