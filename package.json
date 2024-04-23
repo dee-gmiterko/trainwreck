@@ -23,30 +23,31 @@
     "trainwreck"
   ],
   "dependencies": {
-    "@reduxjs/toolkit": "^1.9.1",
-    "autoprefixer": "^10.4.12",
+    "@reduxjs/toolkit": "^2.2.3",
+    "autoprefixer": "^10.4.19",
     "case": "^1.6.3",
     "chroma-js": "^2.4.2",
     "dotenv": "^16.0.3",
     "eases": "^1.0.8",
-    "gatsby": "^4.24.3",
-    "gatsby-plugin-manifest": "^4.24.0",
-    "gatsby-plugin-offline": "^5.24.0",
-    "gatsby-plugin-postcss": "^5.24.0",
-    "gatsby-plugin-sass": "^5.24.0",
-    "gh-pages": "^4.0.0",
-    "pixi-viewport": "^4.38.0",
+    "gatsby": "^5.13.4",
+    "gatsby-plugin-manifest": "^5.13.1",
+    "gatsby-plugin-offline": "^6.13.2",
+    "gatsby-plugin-postcss": "^6.13.1",
+    "gatsby-plugin-sass": "^6.13.1",
+    "gh-pages": "^6.1.1",
+    "pixi-viewport": "^5.1.0",
     "pixi.js": "^7.0.4",
-    "postcss": "^8.4.17",
+    "postcss": "^8.4.38",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-pixi-fiber": "^1.0.4",
+    "react-pixi-fiber": "^1.0.6",
     "react-redux": "<8.0.0",
-    "react-toastify": "^9.1.1",
+    "react-toastify": "^10.0.5",
     "sass": "^1.55.0"
   },
   "devDependencies": {
     "prettier": "2.7.1"
-  }
+  },
+  "packageManager": "yarn@4.1.0"
 }
